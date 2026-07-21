@@ -6,10 +6,8 @@
     <title>AI Research Agent - Executive Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Prevent text jumble and overlap on mobile screens */
         body { word-break: break-word; overflow-wrap: break-word; }
         #res-topic { word-break: break-word; overflow-wrap: break-word; line-height: 1.3; }
-        
         #report-content h1 { font-size: 1.5rem; font-weight: 800; color: #f8fafc; margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 2px solid #334155; word-break: break-word; line-height: 1.3; }
         #report-content h2 { font-size: 1.2rem; font-weight: 700; color: #38bdf8; margin-top: 1.75rem; margin-bottom: 0.75rem; border-left: 4px solid #6366f1; padding-left: 10px; word-break: break-word; line-height: 1.3; }
         #report-content h3 { font-size: 1.05rem; font-weight: 600; color: #cbd5e1; margin-top: 1.25rem; margin-bottom: 0.5rem; word-break: break-word; }
@@ -35,14 +33,13 @@
                     AI Research Agent
                 </h1>
             </div>
-            <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium">● Live V3.2</span>
+            <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium">● Live V3.3</span>
         </div>
     </header>
 
     <!-- Main Container -->
     <main class="max-w-4xl mx-auto w-full px-4 py-6 flex-grow flex flex-col justify-center">
         
-        <!-- Input Form Card -->
         <div id="form-container" class="max-w-xl mx-auto w-full space-y-6 py-8">
             <div class="text-center space-y-2">
                 <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">Autonomous Intelligence</h2>
@@ -71,14 +68,13 @@
             </form>
         </div>
 
-        <!-- Progress Bar & Live Terminal Screen -->
+        <!-- Terminal & Progress Bar -->
         <div id="terminal-container" class="hidden space-y-4 max-w-xl mx-auto w-full py-10">
             <div class="text-center space-y-2">
                 <h3 class="text-lg font-bold text-slate-200">Executing Autonomous Pipeline...</h3>
                 <p id="progress-status-text" class="text-xs text-indigo-400 font-mono">Initializing worker nodes...</p>
             </div>
 
-            <!-- 🌟 Real-time Progress Bar -->
             <div class="w-full bg-slate-900 rounded-full h-3 p-0.5 border border-slate-800 shadow-inner">
                 <div id="progress-bar-fill" class="bg-gradient-to-r from-indigo-500 via-blue-500 to-emerald-400 h-2 rounded-full transition-all duration-300" style="width: 5%;"></div>
             </div>
@@ -87,7 +83,6 @@
                 <span id="progress-pct">5%</span>
             </div>
             
-            <!-- Terminal logs box -->
             <div id="terminal-logs" class="bg-black font-mono text-[11px] text-emerald-400 p-4 rounded-xl h-44 overflow-y-auto border border-slate-800 shadow-2xl space-y-1.5 whitespace-pre-wrap">
                 <p class="text-slate-500">[SYSTEM] Secure connection established...</p>
             </div>
@@ -96,14 +91,12 @@
         <!-- Result Dashboard -->
         <div id="result-container" class="hidden space-y-6 py-4">
             
-            <!-- Top Action Bar with Font Slider (50% to 150%) -->
             <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div class="w-full sm:w-auto truncate">
                     <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Active Topic</span>
                     <h3 id="res-topic" class="text-base font-bold text-white capitalize truncate"></h3>
                 </div>
                 
-                <!-- 🌟 Font Slider (50% to 150%) -->
                 <div class="flex items-center space-x-2 bg-slate-950 px-3 py-2 rounded-xl border border-slate-800 w-full sm:w-auto justify-center">
                     <span class="text-[10px] text-slate-400 font-semibold uppercase whitespace-nowrap">Font: <span id="font-val" class="text-indigo-400 font-bold">100</span>%</span>
                     <input type="range" min="50" max="150" value="100" step="5" oninput="changeFontSize(this.value)" class="w-28 sm:w-24 accent-indigo-500 cursor-pointer">
@@ -116,7 +109,6 @@
                 </div>
             </div>
 
-            <!-- Metrics Bar -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
                 <div class="bg-slate-900/60 border border-slate-800/80 p-3 rounded-xl">
                     <span class="text-[10px] text-slate-400 block uppercase font-semibold">Time Taken</span>
@@ -136,23 +128,19 @@
                 </div>
             </div>
 
-            <!-- Rendered Report Card -->
             <div class="bg-slate-900/90 border border-slate-800 p-6 sm:p-10 rounded-2xl shadow-2xl overflow-hidden">
                 <div id="report-content" class="transition-all duration-150" style="font-size: 15px;">
-                    <!-- Report injects here -->
                 </div>
             </div>
         </div>
 
     </main>
 
-    <!-- Footer -->
     <footer class="text-center py-4 text-[11px] text-slate-500 border-t border-slate-900 mt-12">
-        Powered by Tavily, NVIDIA Llama-3.1, and Gemini Flash.
+        Powered by Tavily, NVIDIA Llama-3.1, and Gemini 2.5 Flash.
     </footer>
 
     <script>
-        // 🌟 Dynamic Font Size Slider Controller (50% to 150%)
         function changeFontSize(val) {
             document.getElementById('font-val').innerText = val;
             const contentBox = document.getElementById('report-content');
@@ -179,7 +167,9 @@
             eventSource.onmessage = function(event) {
                 const rawData = event.data;
 
-                // Parse progress markers e.g. [PROGRESS:40]
+                // 🌟 Ignore anti-timeout ping packets silently
+                if (rawData === "[PING]") return;
+
                 let pct = 10;
                 let cleanData = rawData;
                 if (rawData.startsWith("[PROGRESS:")) {
@@ -190,12 +180,10 @@
                     }
                 }
 
-                // Update Progress Bar smoothly
                 progressBarFill.style.width = pct + '%';
                 progressPct.innerText = pct + '%';
                 progressStatusText.innerText = cleanData;
 
-                // Check if final JSON packet received
                 if (cleanData.startsWith("{")) {
                     try {
                         const packet = JSON.parse(cleanData);
@@ -222,7 +210,6 @@
                     } catch (e) {}
                 }
 
-                // Format terminal log line
                 let formattedLog = cleanData
                     .replace('[step]', '🚀 ')
                     .replace('[/step]', '')
