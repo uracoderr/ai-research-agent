@@ -6,19 +6,22 @@
     <title>AI Research Agent - Executive Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom styling for rendered markdown content to make it colorful & structured */
-        #report-content h1 { font-size: 1.75rem; font-weight: 800; color: #f8fafc; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 2px solid #334155; }
-        #report-content h2 { font-size: 1.35rem; font-weight: 700; color: #38bdf8; margin-top: 2rem; margin-bottom: 1rem; border-left: 4px solid #6366f1; padding-left: 10px; }
-        #report-content h3 { font-size: 1.15rem; font-weight: 600; color: #cbd5e1; margin-top: 1.5rem; margin-bottom: 0.5rem; }
-        #report-content p { color: #94a3b8; line-height: 1.8; margin-bottom: 1rem; }
-        #report-content ul, #report-content ol { margin-bottom: 1rem; padding-left: 1.5rem; color: #94a3b8; }
-        #report-content li { margin-bottom: 0.5rem; line-height: 1.6; }
+        /* Prevent text jumble and overlap on mobile screens */
+        body { word-break: break-word; overflow-wrap: break-word; }
+        #res-topic { word-break: break-word; overflow-wrap: break-word; line-height: 1.3; }
+        
+        #report-content h1 { font-size: 1.5rem; font-weight: 800; color: #f8fafc; margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 2px solid #334155; word-break: break-word; line-height: 1.3; }
+        #report-content h2 { font-size: 1.2rem; font-weight: 700; color: #38bdf8; margin-top: 1.75rem; margin-bottom: 0.75rem; border-left: 4px solid #6366f1; padding-left: 10px; word-break: break-word; line-height: 1.3; }
+        #report-content h3 { font-size: 1.05rem; font-weight: 600; color: #cbd5e1; margin-top: 1.25rem; margin-bottom: 0.5rem; word-break: break-word; }
+        #report-content p { color: #94a3b8; line-height: 1.7; margin-bottom: 1rem; }
+        #report-content ul, #report-content ol { margin-bottom: 1rem; padding-left: 1.25rem; color: #94a3b8; }
+        #report-content li { margin-bottom: 0.4rem; line-height: 1.5; }
         #report-content strong { color: #f1f5f9; font-weight: 600; }
-        #report-content table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9rem; overflow-x: auto; display: block; }
-        #report-content th, #report-content td { border: 1px solid #334155; padding: 10px 14px; text-align: left; }
+        #report-content table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.85rem; overflow-x: auto; display: block; }
+        #report-content th, #report-content td { border: 1px solid #334155; padding: 8px 12px; text-align: left; }
         #report-content th { background-color: #1e293b; color: #f8fafc; font-weight: 600; }
         #report-content td { background-color: #0f172a; color: #cbd5e1; }
-        #report-content blockquote { border-left: 4px solid #10b981; background: rgba(16, 185, 129, 0.05); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 1rem 0; color: #cbd5e1; }
+        #report-content blockquote { border-left: 4px solid #10b981; background: rgba(16, 185, 129, 0.05); padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 1rem 0; color: #cbd5e1; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
@@ -32,7 +35,7 @@
                     AI Research Agent
                 </h1>
             </div>
-            <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium">● Live V3.1</span>
+            <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium">● Live V3.2</span>
         </div>
     </header>
 
@@ -68,42 +71,45 @@
             </form>
         </div>
 
-        <!-- Live Terminal Screen -->
-        <div id="terminal-container" class="hidden space-y-4 max-w-2xl mx-auto w-full py-6">
-            <div class="flex items-center justify-between bg-slate-900 px-4 py-2.5 rounded-t-xl border border-slate-800">
-                <div class="flex space-x-1.5">
-                    <div class="w-2.5 h-2.5 rounded-full bg-red-500/80"></div>
-                    <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></div>
-                    <div class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></div>
-                </div>
-                <span class="text-[11px] text-slate-400 font-mono">pipeline-stream://active</span>
-                <div></div>
+        <!-- Progress Bar & Live Terminal Screen -->
+        <div id="terminal-container" class="hidden space-y-4 max-w-xl mx-auto w-full py-10">
+            <div class="text-center space-y-2">
+                <h3 class="text-lg font-bold text-slate-200">Executing Autonomous Pipeline...</h3>
+                <p id="progress-status-text" class="text-xs text-indigo-400 font-mono">Initializing worker nodes...</p>
+            </div>
+
+            <!-- 🌟 Real-time Progress Bar -->
+            <div class="w-full bg-slate-900 rounded-full h-3 p-0.5 border border-slate-800 shadow-inner">
+                <div id="progress-bar-fill" class="bg-gradient-to-r from-indigo-500 via-blue-500 to-emerald-400 h-2 rounded-full transition-all duration-300" style="width: 5%;"></div>
+            </div>
+            <div class="flex justify-between text-xs text-slate-400 font-mono font-semibold">
+                <span>Progress</span>
+                <span id="progress-pct">5%</span>
             </div>
             
-            <div id="terminal-logs" class="bg-black font-mono text-xs text-emerald-400 p-5 rounded-b-xl h-80 overflow-y-auto border border-slate-800 shadow-2xl space-y-2 whitespace-pre-wrap">
-                <p class="text-slate-500">[SYSTEM] Initializing multi-agent worker node...</p>
+            <!-- Terminal logs box -->
+            <div id="terminal-logs" class="bg-black font-mono text-[11px] text-emerald-400 p-4 rounded-xl h-44 overflow-y-auto border border-slate-800 shadow-2xl space-y-1.5 whitespace-pre-wrap">
+                <p class="text-slate-500">[SYSTEM] Secure connection established...</p>
             </div>
         </div>
 
         <!-- Result Dashboard -->
         <div id="result-container" class="hidden space-y-6 py-4">
             
-            <!-- Top Action Bar with Font Resizer -->
+            <!-- Top Action Bar with Font Slider (50% to 150%) -->
             <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div>
-                    <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Active Topic</span>
-                    <h3 id="res-topic" class="text-base font-bold text-white capitalize truncate max-w-xs"></h3>
+                <div class="w-full sm:w-auto truncate">
+                    <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Active Topic</span>
+                    <h3 id="res-topic" class="text-base font-bold text-white capitalize truncate"></h3>
                 </div>
                 
-                <!-- Font Size Controls -->
-                <div class="flex items-center space-x-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
-                    <span class="text-[10px] text-slate-400 font-semibold uppercase">Text Size:</span>
-                    <button onclick="setFontSize('sm')" class="px-2 py-1 text-xs bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-bold transition">A-</button>
-                    <button onclick="setFontSize('base')" class="px-2 py-1 text-xs bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-bold transition">Med</button>
-                    <button onclick="setFontSize('lg')" class="px-2 py-1 text-xs bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-bold transition">A+</button>
+                <!-- 🌟 Font Slider (50% to 150%) -->
+                <div class="flex items-center space-x-2 bg-slate-950 px-3 py-2 rounded-xl border border-slate-800 w-full sm:w-auto justify-center">
+                    <span class="text-[10px] text-slate-400 font-semibold uppercase whitespace-nowrap">Font: <span id="font-val" class="text-indigo-400 font-bold">100</span>%</span>
+                    <input type="range" min="50" max="150" value="100" step="5" oninput="changeFontSize(this.value)" class="w-28 sm:w-24 accent-indigo-500 cursor-pointer">
                 </div>
 
-                <div class="flex items-center space-x-2">
+                <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
                     <a id="download-md" href="#" download class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-xl font-medium transition border border-slate-700 text-slate-300">.md</a>
                     <a id="download-html" href="#" download class="bg-indigo-600 hover:bg-indigo-500 text-xs px-3 py-2 rounded-xl font-medium transition text-white">.html</a>
                     <button onclick="location.reload()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-xl font-medium transition border border-slate-700 text-slate-300">New</button>
@@ -130,9 +136,9 @@
                 </div>
             </div>
 
-            <!-- Rendered Beautiful Report Card -->
-            <div class="bg-slate-900/90 border border-slate-800 p-6 sm:p-10 rounded-2xl shadow-2xl">
-                <div id="report-content" class="transition-all duration-200 text-sm sm:text-base">
+            <!-- Rendered Report Card -->
+            <div class="bg-slate-900/90 border border-slate-800 p-6 sm:p-10 rounded-2xl shadow-2xl overflow-hidden">
+                <div id="report-content" class="transition-all duration-150" style="font-size: 15px;">
                     <!-- Report injects here -->
                 </div>
             </div>
@@ -146,19 +152,11 @@
     </footer>
 
     <script>
-        function setSize(sizeClass) {
-            const container = document.getElementById('report-content');
-            container.classList.remove('text-sm', 'text-base', 'text-lg', 'text-xl');
-            if(sizeClass === 'sm') container.classList.add('text-xs');
-            if(sizeClass === 'base') container.classList.add('text-sm');
-            if(sizeClass === 'lg') container.classList.add('text-base');
-        }
-
-        function setFontSize(size) {
-            const content = document.getElementById('report-content');
-            if (size === 'sm') content.style.fontSize = '13px';
-            if (size === 'base') content.style.fontSize = '15px';
-            if (size === 'lg') content.style.fontSize = '18px';
+        // 🌟 Dynamic Font Size Slider Controller (50% to 150%)
+        function changeFontSize(val) {
+            document.getElementById('font-val').innerText = val;
+            const contentBox = document.getElementById('report-content');
+            contentBox.style.fontSize = val + '%';
         }
 
         function startResearch(event) {
@@ -170,16 +168,37 @@
             document.getElementById('terminal-container').classList.remove('hidden');
 
             const terminalLogs = document.getElementById('terminal-logs');
+            const progressBarFill = document.getElementById('progress-bar-fill');
+            const progressPct = document.getElementById('progress-pct');
+            const progressStatusText = document.getElementById('progress-status-text');
+
             terminalLogs.innerHTML = `<p class="text-cyan-400">[info] 🚀 Launching research pipeline for '${topic}'...</p>`;
 
             const eventSource = new EventSource(`/stream-research?topic=${encodeURIComponent(topic)}&language=${encodeURIComponent(language)}`);
 
             eventSource.onmessage = function(event) {
-                const data = event.data;
+                const rawData = event.data;
 
-                if (data.startsWith("{")) {
+                // Parse progress markers e.g. [PROGRESS:40]
+                let pct = 10;
+                let cleanData = rawData;
+                if (rawData.startsWith("[PROGRESS:")) {
+                    const match = rawData.match(/\[PROGRESS:(\d+)\](.*)/);
+                    if (match) {
+                        pct = parseInt(match[1]);
+                        cleanData = match[2].trim();
+                    }
+                }
+
+                // Update Progress Bar smoothly
+                progressBarFill.style.width = pct + '%';
+                progressPct.innerText = pct + '%';
+                progressStatusText.innerText = cleanData;
+
+                // Check if final JSON packet received
+                if (cleanData.startsWith("{")) {
                     try {
-                        const packet = JSON.parse(data);
+                        const packet = JSON.parse(cleanData);
                         if (packet.status === "done") {
                             eventSource.close();
                             
@@ -197,13 +216,14 @@
                             setTimeout(() => {
                                 document.getElementById('terminal-container').classList.add('hidden');
                                 document.getElementById('result-container').classList.remove('hidden');
-                            }, 800);
+                            }, 500);
                             return;
                         }
                     } catch (e) {}
                 }
 
-                let cleanLog = data
+                // Format terminal log line
+                let formattedLog = cleanData
                     .replace('[step]', '🚀 ')
                     .replace('[/step]', '')
                     .replace('[info]', 'ℹ️ ')
@@ -216,13 +236,13 @@
                     .replace('[/error]', '');
 
                 const p = document.createElement('p');
-                p.textContent = cleanLog;
+                p.textContent = formattedLog;
                 terminalLogs.appendChild(p);
                 terminalLogs.scrollTop = terminalLogs.scrollHeight;
             };
 
             eventSource.onerror = function(err) {
-                terminalLogs.innerHTML += `<p class="text-red-400">❌ Stream completed or disconnected.</p>`;
+                terminalLogs.innerHTML += `<p class="text-red-400">❌ Stream connection closed.</p>`;
                 eventSource.close();
             };
         }

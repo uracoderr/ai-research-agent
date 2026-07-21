@@ -35,42 +35,45 @@ def render_template(request: Request, template_name: str, context: dict):
 async def home(request: Request):
     return render_template(request, "index.html", {"result": None, "error": None})
 
-# 🌟 Real-time Terminal Log Streaming Endpoint (SSE)
 @app.get("/stream-research")
-async def stream_research(topic: str, language: str):
+async def stream_research(topic: str, language: str = "english"):
     async def event_generator():
         start_time = time.time()
         llm_calls = 0
         try:
-            yield f"data: [step]▶ PHASE 0: QUERY OPTIMIZATION[/step]\n\n"
-            await asyncio.sleep(0.4)
+            # Phase 0
+            yield f"data: [PROGRESS:10]▶ PHASE 0: QUERY OPTIMIZATION...\n\n"
+            await asyncio.sleep(0.3)
             optimized_topic = optimize_query(topic)
             llm_calls += 1
-            yield f"data: [highlight]✨ Query optimized to: '{optimized_topic}'[/highlight]\n\n"
+            yield f"data: [PROGRESS:20]✨ Query optimized to: '{optimized_topic}'\n\n"
             
-            yield f"data: [step]▶ PHASE 1: SEARCHING[/step]\n\n"
-            await asyncio.sleep(0.4)
-            yield f"data: [info]🔍 Tavily API se '{optimized_topic}' ke liye 80 articles fetch kar rahe hain...[/info]\n\n"
+            # Phase 1
+            yield f"data: [PROGRESS:30]▶ PHASE 1: SEARCHING WEB...\n\n"
+            await asyncio.sleep(0.3)
+            yield f"data: [PROGRESS:40]🔍 Tavily API fetching 80 articles...\n\n"
             raw_articles = fetch_articles(optimized_topic, max_results=80)
             if not raw_articles:
-                yield f"data: [error]❌ No articles found for this topic.[/error]\n\n"
+                yield f"data: [PROGRESS:100]❌ No articles found for this topic.\n\n"
                 return
-            yield f"data: [success]✅ Fetched {len(raw_articles)} raw articles successfully![/success]\n\n"
+            yield f"data: [PROGRESS:50]✅ Fetched {len(raw_articles)} raw articles successfully!\n\n"
             
-            yield f"data: [step]▶ PHASE 2: FILTERING & RANKING (NVIDIA LLM)[/step]\n\n"
-            await asyncio.sleep(0.4)
+            # Phase 2
+            yield f"data: [PROGRESS:60]▶ PHASE 2: CREDIBILITY RANKING (NVIDIA LLM)...\n\n"
+            await asyncio.sleep(0.3)
             ranked_articles, duplicates_removed, filter_calls, llm_success = filter_and_rank_articles(raw_articles, top_n=40)
             llm_calls += filter_calls
-            yield f"data: [success]✅ LLM Ranking done! Top {len(ranked_articles)} high-credibility sources selected.[/success]\n\n"
+            yield f"data: [PROGRESS:70]✅ Ranking done! Top {len(ranked_articles)} high-credibility sources selected.\n\n"
             
-            yield f"data: [step]▶ PHASE 3: ASYNC SCRAPING (Target: 15+)[/step]\n\n"
-            await asyncio.sleep(0.4)
+            # Phase 3
+            yield f"data: [PROGRESS:80]▶ PHASE 3: ASYNC SCRAPING (Target: 15+)...\n\n"
+            await asyncio.sleep(0.3)
             scraped_data, scraped_count = scrape_top_articles(ranked_articles, min_required=15)
-            yield f"data: [success]✅ Async Scraping completed! Successful sources: {scraped_count}[/success]\n\n"
+            yield f"data: [PROGRESS:90]✅ Async Scraping completed! Successful sources: {scraped_count}\n\n"
             
-            yield f"data: [step]▶ PHASE 4: REPORT GENERATION (GEMINI)[/step]\n\n"
-            await asyncio.sleep(0.4)
-            yield f"data: [info]🧠 Synthesizing executive report with contradictions & inline citations...[/info]\n\n"
+            # Phase 4
+            yield f"data: [PROGRESS:95]▶ PHASE 4: REPORT SYNTHESIS ({language.capitalize()})...\n\n"
+            await asyncio.sleep(0.3)
             
             stats_dict = {
                 "scraped_success": scraped_count, 
@@ -78,9 +81,10 @@ async def stream_research(topic: str, language: str):
                 "duplicates_removed": duplicates_removed,
                 "llm_ranking_success": llm_success
             }
+            # 🌟 Properly passing user requested language (English/Hinglish/Hindi)
             final_report = generate_report(optimized_topic, scraped_data, language.capitalize(), stats_dict)
             llm_calls += 1
-            yield f"data: [success]✅ Report generation complete![/success]\n\n"
+            yield f"data: [PROGRESS:100]✅ Report generated successfully!\n\n"
             
             # Save files
             safe_topic = optimized_topic.replace(' ', '_').lower()
@@ -106,7 +110,6 @@ async def stream_research(topic: str, language: str):
                 "html_path": f"/{html_filename}"
             }
             
-            # Final packet containing rendered HTML report
             final_packet = {
                 "status": "done",
                 "report": report_html,
@@ -117,7 +120,7 @@ async def stream_research(topic: str, language: str):
             
         except Exception as e:
             err = traceback.format_exc()
-            yield f"data: [error]❌ Pipeline Error: {str(e)}[/error]\n\n"
+            yield f"data: [PROGRESS:100]❌ Pipeline Error: {str(e)}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
