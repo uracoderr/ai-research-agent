@@ -32,12 +32,13 @@
                     AI Research Agent
                 </h1>
             </div>
-            <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium">● Live V4.0 (Voice Enabled)</span>
+            <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium">● Live V4.1 (Stable)</span>
         </div>
     </header>
 
     <main class="max-w-4xl mx-auto w-full px-4 py-6 flex-grow flex flex-col justify-center">
         
+        <!-- Input Form -->
         <div id="form-container" class="max-w-xl mx-auto w-full space-y-6 py-8">
             <div class="text-center space-y-2">
                 <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">Autonomous Intelligence</h2>
@@ -60,31 +61,22 @@
                     </select>
                 </div>
                 
-                <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 font-semibold text-sm py-3 rounded-xl transition shadow-lg shadow-indigo-600/20">
+                <button type="submit" id="submit-btn" class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 font-semibold text-sm py-3 rounded-xl transition shadow-lg shadow-indigo-600/20">
                     Generate Executive Briefing
                 </button>
             </form>
         </div>
 
-        <div id="terminal-container" class="hidden space-y-4 max-w-xl mx-auto w-full py-10">
-            <div class="text-center space-y-2">
-                <h3 class="text-lg font-bold text-slate-200">Executing Autonomous Pipeline...</h3>
-                <p id="progress-status-text" class="text-xs text-indigo-400 font-mono">Initializing worker nodes...</p>
-            </div>
-
-            <div class="w-full bg-slate-900 rounded-full h-3 p-0.5 border border-slate-800 shadow-inner">
-                <div id="progress-bar-fill" class="bg-gradient-to-r from-indigo-500 via-blue-500 to-emerald-400 h-2 rounded-full transition-all duration-300" style="width: 5%;"></div>
-            </div>
-            <div class="flex justify-between text-xs text-slate-400 font-mono font-semibold">
-                <span>Progress</span>
-                <span id="progress-pct">5%</span>
-            </div>
-            
-            <div id="terminal-logs" class="bg-black font-mono text-[11px] text-emerald-400 p-4 rounded-xl h-44 overflow-y-auto border border-slate-800 shadow-2xl space-y-1.5 whitespace-pre-wrap">
-                <p class="text-slate-500">[SYSTEM] Secure connection established...</p>
+        <!-- Sleek Loading Spinner Screen -->
+        <div id="loading-container" class="hidden text-center space-y-6 max-w-md mx-auto py-20">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+            <div class="space-y-2">
+                <h3 class="text-lg font-bold text-white">Autonomous Pipeline Running...</h3>
+                <p class="text-xs text-slate-400">Searching web, ranking via Llama-70B, scraping sources, and synthesizing report. Please wait (~60s)...</p>
             </div>
         </div>
 
+        <!-- Result Dashboard -->
         <div id="result-container" class="hidden space-y-6 py-4">
             
             <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl flex flex-col lg:flex-row items-center justify-between gap-4">
@@ -99,7 +91,6 @@
                 </div>
 
                 <div class="flex flex-wrap items-center justify-center gap-2 w-full lg:w-auto">
-                    <!-- 🌟 New Voice Button -->
                     <button id="speak-btn" onclick="toggleSpeech()" class="bg-pink-600 hover:bg-pink-500 text-xs px-3 py-2 rounded-xl font-bold transition text-white shadow-lg shadow-pink-600/20 flex items-center space-x-1">
                         <span>🔊 Read Report</span>
                     </button>
@@ -141,147 +132,88 @@
     </footer>
 
     <script>
-        // 🌟 VOICE (TEXT-TO-SPEECH) LOGIC
         let isSpeaking = false;
         const synth = window.speechSynthesis;
         let utterance = null;
 
         function toggleSpeech() {
             const btn = document.getElementById('speak-btn');
-            
             if (isSpeaking) {
-                synth.cancel(); // Stop reading
+                synth.cancel();
                 isSpeaking = false;
                 btn.innerHTML = '🔊 Read Report';
                 btn.classList.replace('bg-red-600', 'bg-pink-600');
-                btn.classList.replace('hover:bg-red-500', 'hover:bg-pink-500');
                 return;
             }
-
-            // Get the clean text from the report content div
             const reportContent = document.getElementById('report-content').innerText;
             if (!reportContent) return;
 
             utterance = new SpeechSynthesisUtterance(reportContent);
-            
-            // Set language based on dropdown
             const selectedLang = document.getElementById('lang-input').value;
-            if (selectedLang === 'hindi' || selectedLang === 'hinglish') {
-                utterance.lang = 'hi-IN'; // Indian/Hindi accent
-            } else {
-                utterance.lang = 'en-US'; // English accent
-            }
-
-            utterance.rate = 0.9; // Slightly slower for better understanding
+            utterance.lang = (selectedLang === 'hindi' || selectedLang === 'hinglish') ? 'hi-IN' : 'en-US';
+            utterance.rate = 0.9;
             
             utterance.onend = function() {
                 isSpeaking = false;
                 btn.innerHTML = '🔊 Read Report';
                 btn.classList.replace('bg-red-600', 'bg-pink-600');
-                btn.classList.replace('hover:bg-red-500', 'hover:bg-pink-500');
             };
 
             synth.speak(utterance);
             isSpeaking = true;
             btn.innerHTML = '🔇 Stop Reading';
             btn.classList.replace('bg-pink-600', 'bg-red-600');
-            btn.classList.replace('hover:bg-pink-500', 'hover:bg-red-500');
         }
 
-        // Cancel speech if user navigates away or reloads
-        window.onbeforeunload = function() {
-            if (synth) synth.cancel();
-        };
+        window.onbeforeunload = function() { if (synth) synth.cancel(); };
 
         function changeFontSize(val) {
             document.getElementById('font-val').innerText = val;
-            const contentBox = document.getElementById('report-content');
-            contentBox.style.fontSize = val + '%';
+            document.getElementById('report-content').style.fontSize = val + '%';
         }
 
-        function startResearch(event) {
+        async function startResearch(event) {
             event.preventDefault();
             const topic = document.getElementById('topic-input').value;
             const language = document.getElementById('lang-input').value;
 
             document.getElementById('form-container').classList.add('hidden');
-            document.getElementById('terminal-container').classList.remove('hidden');
+            document.getElementById('loading-container').classList.remove('hidden');
 
-            const terminalLogs = document.getElementById('terminal-logs');
-            const progressBarFill = document.getElementById('progress-bar-fill');
-            const progressPct = document.getElementById('progress-pct');
-            const progressStatusText = document.getElementById('progress-status-text');
+            const formData = new FormData();
+            formData.append('topic', topic);
+            formData.append('language', language);
 
-            terminalLogs.innerHTML = `<p class="text-cyan-400">[info] 🚀 Launching research pipeline for '${topic}'...</p>`;
+            try {
+                const response = await fetch('/run-research', {
+                    method: 'POST',
+                    body: formData
+                });
 
-            const eventSource = new EventSource(`/stream-research?topic=${encodeURIComponent(topic)}&language=${encodeURIComponent(language)}`);
+                const data = await response.json();
 
-            eventSource.onmessage = function(event) {
-                const rawData = event.data;
-                if (rawData === "[PING]") return;
+                if (data.status === "success") {
+                    document.getElementById('loading-container').classList.add('hidden');
+                    document.getElementById('result-container').classList.remove('hidden');
 
-                let pct = 10;
-                let cleanData = rawData;
-                if (rawData.startsWith("[PROGRESS:")) {
-                    const match = rawData.match(/\[PROGRESS:(\d+)\](.*)/);
-                    if (match) {
-                        pct = parseInt(match[1]);
-                        cleanData = match[2].trim();
-                    }
+                    document.getElementById('res-topic').innerText = data.topic;
+                    document.getElementById('download-md').href = data.metrics.md_path;
+                    document.getElementById('download-html').href = data.metrics.html_path;
+                    
+                    document.getElementById('m-time').innerText = data.metrics.time + 's';
+                    document.getElementById('m-calls').innerText = data.metrics.calls;
+                    document.getElementById('m-fetched').innerText = data.metrics.fetched;
+                    document.getElementById('m-scraped').innerText = data.metrics.scraped;
+                    
+                    document.getElementById('report-content').innerHTML = data.report;
+                } else {
+                    alert("Error: " + (data.message || "Unknown error occurred"));
+                    location.reload();
                 }
-
-                progressBarFill.style.width = pct + '%';
-                progressPct.innerText = pct + '%';
-                progressStatusText.innerText = cleanData;
-
-                if (cleanData.startsWith("{")) {
-                    try {
-                        const packet = JSON.parse(cleanData);
-                        if (packet.status === "done") {
-                            eventSource.close();
-                            
-                            document.getElementById('res-topic').innerText = packet.topic;
-                            document.getElementById('download-md').href = packet.metrics.md_path;
-                            document.getElementById('download-html').href = packet.metrics.html_path;
-                            
-                            document.getElementById('m-time').innerText = packet.metrics.time + 's';
-                            document.getElementById('m-calls').innerText = packet.metrics.calls;
-                            document.getElementById('m-fetched').innerText = packet.metrics.fetched;
-                            document.getElementById('m-scraped').innerText = packet.metrics.scraped;
-                            
-                            document.getElementById('report-content').innerHTML = packet.report;
-
-                            setTimeout(() => {
-                                document.getElementById('terminal-container').classList.add('hidden');
-                                document.getElementById('result-container').classList.remove('hidden');
-                            }, 500);
-                            return;
-                        }
-                    } catch (e) {}
-                }
-
-                let formattedLog = cleanData
-                    .replace('[step]', '🚀 ')
-                    .replace('[/step]', '')
-                    .replace('[info]', 'ℹ️ ')
-                    .replace('[/info]', '')
-                    .replace('[success]', '✅ ')
-                    .replace('[/success]', '')
-                    .replace('[highlight]', '💡 ')
-                    .replace('[/highlight]', '')
-                    .replace('[error]', '❌ ')
-                    .replace('[/error]', '');
-
-                const p = document.createElement('p');
-                p.textContent = formattedLog;
-                terminalLogs.appendChild(p);
-                terminalLogs.scrollTop = terminalLogs.scrollHeight;
-            };
-
-            eventSource.onerror = function(err) {
-                terminalLogs.innerHTML += `<p class="text-red-400">❌ Stream connection closed.</p>`;
-                eventSource.close();
-            };
+            } catch (err) {
+                alert("Request failed: " + err);
+                location.reload();
+            }
         }
     </script>
 </body>

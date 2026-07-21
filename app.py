@@ -1,11 +1,10 @@
 import os
 import time
 import json
-import asyncio
 import traceback
 import markdown
 from fastapi import FastAPI, Form, Request
-from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 
@@ -35,119 +34,71 @@ def render_template(request: Request, template_name: str, context: dict):
 async def home(request: Request):
     return render_template(request, "index.html", {"result": None, "error": None})
 
-@app.get("/stream-research")
-async def stream_research(topic: str, language: str = "english"):
-    async def event_generator():
-        start_time = time.time()
-        llm_calls = 0
-        try:
-            # Phase 0
-            yield f"data: [PROGRESS:10]▶ PHASE 0: QUERY OPTIMIZATION...\n\n"
+@app.post("/run-research")
+async def run_research(topic: str = Form(...), language: str = Form(...)):
+    start_time = time.time()
+    llm_calls = 0
+    try:
+        # Phase 0: Query Optimization
+        optimized_topic = optimize_query(topic)
+        llm_calls += 1
+        
+        # Phase 1: Search
+        raw_articles = fetch_articles(optimized_topic, max_results=80)
+        if not raw_articles:
+            return JSONResponse({"status": "error", "message": "No articles found for this topic."})
+        
+        # Phase 2: Filtering & Ranking (70B)
+        ranked_articles, duplicates_removed, filter_calls, llm_success = filter_and_rank_articles(raw_articles, top_n=40)
+        llm_calls += filter_calls
+        
+        # Phase 3: Scraping
+        scraped_data, scraped_count = scrape_top_articles(ranked_articles, min_required=15)
+        
+        # Phase 4: Report Synthesis
+        stats_dict = {
+            "scraped_success": scraped_count, 
+            "avg_credibility": 8.5, 
+            "duplicates_removed": duplicates_removed,
+            "llm_ranking_success": llm_success
+        }
+        
+        final_report, model_used = generate_report(optimized_topic, scraped_data, language.capitalize(), stats_dict)
+        llm_calls += 1
+        
+        # Save files
+        safe_topic = optimized_topic.replace(' ', '_').lower()
+        md_filename = os.path.join("reports", f"{safe_topic}_report.md")
+        html_filename = os.path.join("reports", f"{safe_topic}_report.html")
+        
+        with open(os.path.join(BASE_DIR, md_filename), "w", encoding="utf-8") as f:
+            f.write(final_report)
             
-            # 🌟 HELPER LOOP: Keeps Render connection alive while background task runs
-            task = asyncio.create_task(asyncio.to_thread(optimize_query, topic))
-            while not task.done():
-                yield "data: [PING]\n\n"  # Anti-timeout Ping
-                await asyncio.sleep(2)
-            optimized_topic = task.result()
+        html_content = f"<html><head><meta charset='utf-8'><title>{optimized_topic}</title></head><body>{markdown.markdown(final_report, extensions=['tables'])}</body></html>"
+        with open(os.path.join(BASE_DIR, html_filename), "w", encoding="utf-8") as f:
+            f.write(html_content)
             
-            llm_calls += 1
-            yield f"data: [PROGRESS:20]✨ Query optimized to: '{optimized_topic}'\n\n"
-            
-            # Phase 1
-            yield f"data: [PROGRESS:30]▶ PHASE 1: SEARCHING WEB...\n\n"
-            yield f"data: [PROGRESS:40]🔍 Tavily API fetching 80 articles...\n\n"
-            
-            task = asyncio.create_task(asyncio.to_thread(fetch_articles, optimized_topic, max_results=80))
-            while not task.done():
-                yield "data: [PING]\n\n"
-                await asyncio.sleep(2)
-            raw_articles = task.result()
-            
-            if not raw_articles:
-                yield f"data: [PROGRESS:100]❌ No articles found for this topic.\n\n"
-                return
-            yield f"data: [PROGRESS:50]✅ Fetched {len(raw_articles)} raw articles successfully!\n\n"
-            
-            # Phase 2
-            yield f"data: [PROGRESS:60]▶ PHASE 2: CREDIBILITY RANKING (NVIDIA LLM)...\n\n"
-            
-            task = asyncio.create_task(asyncio.to_thread(filter_and_rank_articles, raw_articles, top_n=40))
-            while not task.done():
-                yield "data: [PING]\n\n"
-                await asyncio.sleep(2)
-            ranked_articles, duplicates_removed, filter_calls, llm_success = task.result()
-            
-            llm_calls += filter_calls
-            yield f"data: [PROGRESS:70]✅ Ranking done! Top {len(ranked_articles)} high-credibility sources selected.\n\n"
-            
-            # Phase 3
-            yield f"data: [PROGRESS:80]▶ PHASE 3: ASYNC SCRAPING (Target: 15+)...\n\n"
-            
-            task = asyncio.create_task(asyncio.to_thread(scrape_top_articles, ranked_articles, min_required=15))
-            while not task.done():
-                yield "data: [PING]\n\n"
-                await asyncio.sleep(2)
-            scraped_data, scraped_count = task.result()
-            
-            yield f"data: [PROGRESS:90]✅ Async Scraping completed! Successful sources: {scraped_count}\n\n"
-            
-            # Phase 4
-            yield f"data: [PROGRESS:95]▶ PHASE 4: EXTENSIVE REPORT SYNTHESIS ({language.capitalize()})...\n\n"
-            
-            stats_dict = {
-                "scraped_success": scraped_count, 
-                "avg_credibility": 8.5, 
-                "duplicates_removed": duplicates_removed,
-                "llm_ranking_success": llm_success
-            }
-            
-            task = asyncio.create_task(asyncio.to_thread(generate_report, optimized_topic, scraped_data, language.capitalize(), stats_dict))
-            while not task.done():
-                yield "data: [PING]\n\n"
-                await asyncio.sleep(2)
-            final_report, model_used = task.result()
-            
-            llm_calls += 1
-            yield f"data: [PROGRESS:100]✅ Comprehensive report generated via {model_used}!\n\n"
-            
-            # Save files
-            safe_topic = optimized_topic.replace(' ', '_').lower()
-            md_filename = os.path.join("reports", f"{safe_topic}_report.md")
-            html_filename = os.path.join("reports", f"{safe_topic}_report.html")
-            
-            with open(os.path.join(BASE_DIR, md_filename), "w", encoding="utf-8") as f:
-                f.write(final_report)
-                
-            html_content = f"<html><head><meta charset='utf-8'><title>{optimized_topic}</title></head><body>{markdown.markdown(final_report, extensions=['tables'])}</body></html>"
-            with open(os.path.join(BASE_DIR, html_filename), "w", encoding="utf-8") as f:
-                f.write(html_content)
-                
-            report_html = markdown.markdown(final_report, extensions=['tables', 'fenced_code'])
-            
-            end_time = time.time()
-            metrics = {
-                "time": round(end_time - start_time, 1),
-                "calls": llm_calls,
-                "fetched": len(raw_articles),
-                "scraped": scraped_count,
-                "md_path": f"/{md_filename}",
-                "html_path": f"/{html_filename}"
-            }
-            
-            final_packet = {
-                "status": "done",
-                "report": report_html,
-                "metrics": metrics,
-                "topic": optimized_topic
-            }
-            yield f"data: {json.dumps(final_packet)}\n\n"
-            
-        except Exception as e:
-            err = traceback.format_exc()
-            yield f"data: [PROGRESS:100]❌ Pipeline Error: {str(e)}\n\n"
-
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
+        report_html = markdown.markdown(final_report, extensions=['tables', 'fenced_code'])
+        
+        end_time = time.time()
+        metrics = {
+            "time": round(end_time - start_time, 1),
+            "calls": llm_calls,
+            "fetched": len(raw_articles),
+            "scraped": scraped_count,
+            "md_path": f"/{md_filename}",
+            "html_path": f"/{html_filename}"
+        }
+        
+        return {
+            "status": "success",
+            "topic": optimized_topic,
+            "report": report_html,
+            "metrics": metrics
+        }
+        
+    except Exception as e:
+        return JSONResponse({"status": "error", "message": str(e)})
 
 if __name__ == "__main__":
     import uvicorn
