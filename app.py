@@ -22,10 +22,19 @@ reports_dir = os.path.join(BASE_DIR, "reports")
 os.makedirs(reports_dir, exist_ok=True)
 app.mount("/reports", StaticFiles(directory=reports_dir), name="reports")
 
+# 🌟 Universal Template Response Helper (Prevents version mismatch 500 errors)
+def render_template(request: Request, template_name: str, context: dict):
+    try:
+        # New FastAPI / Starlette syntax
+        return templates.TemplateResponse(request, template_name, context)
+    except TypeError:
+        # Fallback for older Starlette versions
+        context["request"] = request
+        return templates.TemplateResponse(template_name, context)
+
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    # 🌟 Fixed TemplateResponse syntax for modern FastAPI/Starlette
-    return templates.TemplateResponse(request, "index.html", {"result": None, "error": None})
+    return render_template(request, "index.html", {"result": None, "error": None})
 
 @app.post("/research", response_class=HTMLResponse)
 async def run_research(request: Request, topic: str = Form(...), language: str = Form(...)):
@@ -39,7 +48,7 @@ async def run_research(request: Request, topic: str = Form(...), language: str =
         
         raw_articles = fetch_articles(optimized_topic, max_results=80)
         if not raw_articles:
-            return templates.TemplateResponse(request, "index.html", {
+            return render_template(request, "index.html", {
                 "result": None, 
                 "error": "No articles found for this topic. Try something else."
             })
@@ -89,10 +98,9 @@ async def run_research(request: Request, topic: str = Form(...), language: str =
             "html_path": f"/{html_filename}"
         }
         
-        # Convert report to HTML for clean browser rendering inside UI
         report_html = markdown.markdown(final_report, extensions=['tables', 'fenced_code'])
         
-        return templates.TemplateResponse(request, "index.html", {
+        return render_template(request, "index.html", {
             "result": report_html, 
             "metrics": metrics,
             "topic": optimized_topic,
@@ -100,7 +108,7 @@ async def run_research(request: Request, topic: str = Form(...), language: str =
         })
         
     except Exception as e:
-        return templates.TemplateResponse(request, "index.html", {
+        return render_template(request, "index.html", {
             "result": None, 
             "error": f"Pipeline Error: {str(e)}"
         })
