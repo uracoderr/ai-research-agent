@@ -63,7 +63,7 @@ def filter_and_rank_articles(articles: list, top_n: int = 40) -> tuple:
             console.print(f"[info]🧠 LLM Ranking (Attempt {attempt}/{max_retries})...[/info]")
             
             # Direct string url passed safely
-            response = requests.post(api_url, headers=headers, json=payload, timeout=35)
+            response = requests.post(api_url, headers=headers, json=payload, timeout=350)
             response.raise_for_status()
             reply = response.json()["choices"][0]["message"]["content"]
             

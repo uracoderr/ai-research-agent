@@ -85,7 +85,7 @@ def generate_report(topic: str, scraped_text: str, language: str, stats: dict) -
     payload = {"contents": [{"parts": [{"text": prompt}]}]}
 
     try:
-        response = requests.post(gemini_url, json=payload, headers={"Content-Type": "application/json"}, timeout=45)
+        response = requests.post(gemini_url, json=payload, headers={"Content-Type": "application/json"}, timeout=450)
         
         if response.status_code == 200:
             data = response.json()
