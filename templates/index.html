@@ -32,7 +32,7 @@
                     AI Research Agent
                 </h1>
             </div>
-            <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium">● Live V4.1 (Stable)</span>
+            <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium">● Live V4.2 (Progress Bar Restored)</span>
         </div>
     </header>
 
@@ -61,18 +61,29 @@
                     </select>
                 </div>
                 
-                <button type="submit" id="submit-btn" class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 font-semibold text-sm py-3 rounded-xl transition shadow-lg shadow-indigo-600/20">
+                <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 font-semibold text-sm py-3 rounded-xl transition shadow-lg shadow-indigo-600/20">
                     Generate Executive Briefing
                 </button>
             </form>
         </div>
 
-        <!-- Sleek Loading Spinner Screen -->
-        <div id="loading-container" class="hidden text-center space-y-6 max-w-md mx-auto py-20">
-            <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
-            <div class="space-y-2">
-                <h3 class="text-lg font-bold text-white">Autonomous Pipeline Running...</h3>
-                <p class="text-xs text-slate-400">Searching web, ranking via Llama-70B, scraping sources, and synthesizing report. Please wait (~60s)...</p>
+        <!-- 🌟 Restored Live Progress Bar & Terminal Screen -->
+        <div id="terminal-container" class="hidden space-y-4 max-w-xl mx-auto w-full py-10">
+            <div class="text-center space-y-2">
+                <h3 class="text-lg font-bold text-slate-200">Executing Autonomous Pipeline...</h3>
+                <p id="progress-status-text" class="text-xs text-indigo-400 font-mono">Initializing worker nodes...</p>
+            </div>
+
+            <div class="w-full bg-slate-900 rounded-full h-3 p-0.5 border border-slate-800 shadow-inner">
+                <div id="progress-bar-fill" class="bg-gradient-to-r from-indigo-500 via-blue-500 to-emerald-400 h-2 rounded-full transition-all duration-300" style="width: 5%;"></div>
+            </div>
+            <div class="flex justify-between text-xs text-slate-400 font-mono font-semibold">
+                <span>Progress</span>
+                <span id="progress-pct">5%</span>
+            </div>
+            
+            <div id="terminal-logs" class="bg-black font-mono text-[11px] text-emerald-400 p-4 rounded-xl h-44 overflow-y-auto border border-slate-800 shadow-2xl space-y-1.5 whitespace-pre-wrap">
+                <p class="text-slate-500">[SYSTEM] Secure connection established...</p>
             </div>
         </div>
 
@@ -172,48 +183,89 @@
             document.getElementById('report-content').style.fontSize = val + '%';
         }
 
-        async function startResearch(event) {
+        function startResearch(event) {
             event.preventDefault();
             const topic = document.getElementById('topic-input').value;
             const language = document.getElementById('lang-input').value;
 
             document.getElementById('form-container').classList.add('hidden');
-            document.getElementById('loading-container').classList.remove('hidden');
+            document.getElementById('terminal-container').classList.remove('hidden');
 
-            const formData = new FormData();
-            formData.append('topic', topic);
-            formData.append('language', language);
+            const terminalLogs = document.getElementById('terminal-logs');
+            const progressBarFill = document.getElementById('progress-bar-fill');
+            const progressPct = document.getElementById('progress-pct');
+            const progressStatusText = document.getElementById('progress-status-text');
 
-            try {
-                const response = await fetch('/run-research', {
-                    method: 'POST',
-                    body: formData
-                });
+            terminalLogs.innerHTML = `<p class="text-cyan-400">[info] 🚀 Launching research pipeline for '${topic}'...</p>`;
 
-                const data = await response.json();
+            const eventSource = new EventSource(`/stream-research?topic=${encodeURIComponent(topic)}&language=${encodeURIComponent(language)}`);
 
-                if (data.status === "success") {
-                    document.getElementById('loading-container').classList.add('hidden');
-                    document.getElementById('result-container').classList.remove('hidden');
+            eventSource.onmessage = function(event) {
+                const rawData = event.data;
 
-                    document.getElementById('res-topic').innerText = data.topic;
-                    document.getElementById('download-md').href = data.metrics.md_path;
-                    document.getElementById('download-html').href = data.metrics.html_path;
-                    
-                    document.getElementById('m-time').innerText = data.metrics.time + 's';
-                    document.getElementById('m-calls').innerText = data.metrics.calls;
-                    document.getElementById('m-fetched').innerText = data.metrics.fetched;
-                    document.getElementById('m-scraped').innerText = data.metrics.scraped;
-                    
-                    document.getElementById('report-content').innerHTML = data.report;
-                } else {
-                    alert("Error: " + (data.message || "Unknown error occurred"));
-                    location.reload();
+                let pct = 10;
+                let cleanData = rawData;
+                if (rawData.startsWith("[PROGRESS:")) {
+                    const match = rawData.match(/\[PROGRESS:(\d+)\](.*)/);
+                    if (match) {
+                        pct = parseInt(match[1]);
+                        cleanData = match[2].trim();
+                    }
                 }
-            } catch (err) {
-                alert("Request failed: " + err);
-                location.reload();
-            }
+
+                // Smooth Progress Bar Update
+                progressBarFill.style.width = pct + '%';
+                progressPct.innerText = pct + '%';
+                progressStatusText.innerText = cleanData;
+
+                if (cleanData.startsWith("{")) {
+                    try {
+                        const packet = JSON.parse(cleanData);
+                        if (packet.status === "done") {
+                            eventSource.close();
+                            
+                            document.getElementById('res-topic').innerText = packet.topic;
+                            document.getElementById('download-md').href = packet.metrics.md_path;
+                            document.getElementById('download-html').href = packet.metrics.html_path;
+                            
+                            document.getElementById('m-time').innerText = packet.metrics.time + 's';
+                            document.getElementById('m-calls').innerText = packet.metrics.calls;
+                            document.getElementById('m-fetched').innerText = packet.metrics.fetched;
+                            document.getElementById('m-scraped').innerText = packet.metrics.scraped;
+                            
+                            document.getElementById('report-content').innerHTML = packet.report;
+
+                            setTimeout(() => {
+                                document.getElementById('terminal-container').classList.add('hidden');
+                                document.getElementById('result-container').classList.remove('hidden');
+                            }, 500);
+                            return;
+                        }
+                    } catch (e) {}
+                }
+
+                let formattedLog = cleanData
+                    .replace('[step]', '🚀 ')
+                    .replace('[/step]', '')
+                    .replace('[info]', 'ℹ️ ')
+                    .replace('[/info]', '')
+                    .replace('[success]', '✅ ')
+                    .replace('[/success]', '')
+                    .replace('[highlight]', '💡 ')
+                    .replace('[/highlight]', '')
+                    .replace('[error]', '❌ ')
+                    .replace('[/error]', '');
+
+                const p = document.createElement('p');
+                p.textContent = formattedLog;
+                terminalLogs.appendChild(p);
+                terminalLogs.scrollTop = terminalLogs.scrollHeight;
+            };
+
+            eventSource.onerror = function(err) {
+                terminalLogs.innerHTML += `<p class="text-red-400">❌ Stream connection closed.</p>`;
+                eventSource.close();
+            };
         }
     </script>
 </body>
