@@ -24,7 +24,6 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
 
-    <!-- Header -->
     <header class="border-b border-slate-800/80 px-4 py-3 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
         <div class="max-w-4xl mx-auto flex items-center justify-between">
             <div class="flex items-center space-x-2">
@@ -33,17 +32,16 @@
                     AI Research Agent
                 </h1>
             </div>
-            <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium">● Live V3.3</span>
+            <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium">● Live V4.0 (Voice Enabled)</span>
         </div>
     </header>
 
-    <!-- Main Container -->
     <main class="max-w-4xl mx-auto w-full px-4 py-6 flex-grow flex flex-col justify-center">
         
         <div id="form-container" class="max-w-xl mx-auto w-full space-y-6 py-8">
             <div class="text-center space-y-2">
                 <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">Autonomous Intelligence</h2>
-                <p class="text-slate-400 text-xs sm:text-sm">Search ➔ Llama Credibility Ranking ➔ Async Scraping ➔ Deep Synthesis.</p>
+                <p class="text-slate-400 text-xs sm:text-sm">Search ➔ Llama 70B Ranking ➔ Async Scraping ➔ Deep Synthesis.</p>
             </div>
             
             <form id="research-form" onsubmit="startResearch(event)" class="space-y-4 bg-slate-900/80 p-6 rounded-2xl border border-slate-800 shadow-2xl">
@@ -68,7 +66,6 @@
             </form>
         </div>
 
-        <!-- Terminal & Progress Bar -->
         <div id="terminal-container" class="hidden space-y-4 max-w-xl mx-auto w-full py-10">
             <div class="text-center space-y-2">
                 <h3 class="text-lg font-bold text-slate-200">Executing Autonomous Pipeline...</h3>
@@ -88,21 +85,24 @@
             </div>
         </div>
 
-        <!-- Result Dashboard -->
         <div id="result-container" class="hidden space-y-6 py-4">
             
-            <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div class="w-full sm:w-auto truncate">
+            <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl flex flex-col lg:flex-row items-center justify-between gap-4">
+                <div class="w-full lg:w-auto truncate">
                     <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Active Topic</span>
                     <h3 id="res-topic" class="text-base font-bold text-white capitalize truncate"></h3>
                 </div>
                 
-                <div class="flex items-center space-x-2 bg-slate-950 px-3 py-2 rounded-xl border border-slate-800 w-full sm:w-auto justify-center">
+                <div class="flex items-center space-x-2 bg-slate-950 px-3 py-2 rounded-xl border border-slate-800 w-full lg:w-auto justify-center">
                     <span class="text-[10px] text-slate-400 font-semibold uppercase whitespace-nowrap">Font: <span id="font-val" class="text-indigo-400 font-bold">100</span>%</span>
-                    <input type="range" min="50" max="150" value="100" step="5" oninput="changeFontSize(this.value)" class="w-28 sm:w-24 accent-indigo-500 cursor-pointer">
+                    <input type="range" min="50" max="150" value="100" step="5" oninput="changeFontSize(this.value)" class="w-24 accent-indigo-500 cursor-pointer">
                 </div>
 
-                <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+                <div class="flex flex-wrap items-center justify-center gap-2 w-full lg:w-auto">
+                    <!-- 🌟 New Voice Button -->
+                    <button id="speak-btn" onclick="toggleSpeech()" class="bg-pink-600 hover:bg-pink-500 text-xs px-3 py-2 rounded-xl font-bold transition text-white shadow-lg shadow-pink-600/20 flex items-center space-x-1">
+                        <span>🔊 Read Report</span>
+                    </button>
                     <a id="download-md" href="#" download class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-xl font-medium transition border border-slate-700 text-slate-300">.md</a>
                     <a id="download-html" href="#" download class="bg-indigo-600 hover:bg-indigo-500 text-xs px-3 py-2 rounded-xl font-medium transition text-white">.html</a>
                     <button onclick="location.reload()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-xl font-medium transition border border-slate-700 text-slate-300">New</button>
@@ -137,10 +137,62 @@
     </main>
 
     <footer class="text-center py-4 text-[11px] text-slate-500 border-t border-slate-900 mt-12">
-        Powered by Tavily, NVIDIA Llama-3.1, and Gemini 2.5 Flash.
+        Powered by Tavily, NVIDIA Llama-3.1 70B, and Gemini.
     </footer>
 
     <script>
+        // 🌟 VOICE (TEXT-TO-SPEECH) LOGIC
+        let isSpeaking = false;
+        const synth = window.speechSynthesis;
+        let utterance = null;
+
+        function toggleSpeech() {
+            const btn = document.getElementById('speak-btn');
+            
+            if (isSpeaking) {
+                synth.cancel(); // Stop reading
+                isSpeaking = false;
+                btn.innerHTML = '🔊 Read Report';
+                btn.classList.replace('bg-red-600', 'bg-pink-600');
+                btn.classList.replace('hover:bg-red-500', 'hover:bg-pink-500');
+                return;
+            }
+
+            // Get the clean text from the report content div
+            const reportContent = document.getElementById('report-content').innerText;
+            if (!reportContent) return;
+
+            utterance = new SpeechSynthesisUtterance(reportContent);
+            
+            // Set language based on dropdown
+            const selectedLang = document.getElementById('lang-input').value;
+            if (selectedLang === 'hindi' || selectedLang === 'hinglish') {
+                utterance.lang = 'hi-IN'; // Indian/Hindi accent
+            } else {
+                utterance.lang = 'en-US'; // English accent
+            }
+
+            utterance.rate = 0.9; // Slightly slower for better understanding
+            
+            utterance.onend = function() {
+                isSpeaking = false;
+                btn.innerHTML = '🔊 Read Report';
+                btn.classList.replace('bg-red-600', 'bg-pink-600');
+                btn.classList.replace('hover:bg-red-500', 'hover:bg-pink-500');
+            };
+
+            synth.speak(utterance);
+            isSpeaking = true;
+            btn.innerHTML = '🔇 Stop Reading';
+            btn.classList.replace('bg-pink-600', 'bg-red-600');
+            btn.classList.replace('hover:bg-pink-500', 'hover:bg-red-500');
+        }
+
+        // Cancel speech if user navigates away or reloads
+        window.onbeforeunload = function() {
+            if (synth) synth.cancel();
+        };
+
         function changeFontSize(val) {
             document.getElementById('font-val').innerText = val;
             const contentBox = document.getElementById('report-content');
@@ -166,8 +218,6 @@
 
             eventSource.onmessage = function(event) {
                 const rawData = event.data;
-
-                // 🌟 Ignore anti-timeout ping packets silently
                 if (rawData === "[PING]") return;
 
                 let pct = 10;
