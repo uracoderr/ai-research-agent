@@ -1,5 +1,6 @@
 import requests
 import json
+import sys
 from config import console, GEMINI_API_KEY, NVIDIA_API_KEY
 
 def generate_report(topic: str, scraped_text: str, language: str, stats: dict) -> tuple:
@@ -11,7 +12,7 @@ def generate_report(topic: str, scraped_text: str, language: str, stats: dict) -
     llm_penalty = 0 if stats['llm_ranking_success'] else 15
     confidence_score = max(50, min(98, int(base_score + volume_score - llm_penalty)))
 
-    # 🌟 Ultra-strict language instruction builder with examples
+    # Ultra-strict language instruction builder
     lang_lower = language.lower()
     if "hinglish" in lang_lower:
         lang_instruction = (
@@ -39,7 +40,7 @@ def generate_report(topic: str, scraped_text: str, language: str, stats: dict) -
     
     Use the provided scraped data thoroughly. Cite sources appropriately using inline tags like [Source Name].
     
-    REQUIRED DEEP-DIVE REPORT STRUCTURE (Make each section long, detailed, and rich in analysis):
+    REQUIRED DEEP-DIVE REPORT STRUCTURE:
     
     # [Topic] - Comprehensive Industry Intelligence Report 2026
     
@@ -52,16 +53,16 @@ def generate_report(topic: str, scraped_text: str, language: str, stats: dict) -
     - **Synthesis Model:** [MODEL_TAG]
     
     ## 📑 Executive Summary & Deep Market Context
-    (Provide a lengthy, highly detailed breakdown of the core landscape, macro shifts, and immediate takeaways. Expand into multiple paragraphs.)
+    (Provide a lengthy, highly detailed breakdown of the core landscape, macro shifts, and immediate takeaways.)
     
     ## 🔬 Comprehensive Technical & Market Analysis
-    (Provide an exhaustive deep-dive analysis. Break down core pillars, technical innovations, market drivers, contrasting viewpoints, and contradictions found across sources. Use multiple subsections or detailed paragraphs.)
+    (Provide an exhaustive deep-dive analysis. Break down core pillars, technical innovations, and market drivers.)
     
     ## 📈 Granular Opportunity & Risk Matrix
-    (Provide an extensive breakdown of market opportunities vs significant systemic risks. Include structured markdown tables or bulleted analysis.)
+    (Provide an extensive breakdown of market opportunities vs significant systemic risks.)
     
     ## 🚀 Long-term Strategic Predictions & Actionable Roadmap
-    (Provide detailed 2 to 5 year timelines, predictions, and strategic advice for stakeholders.)
+    (Provide detailed 2 to 5 year timelines, predictions, and strategic advice.)
     
     ## 📚 Weighted Sources & Credibility Breakdown
     (List and evaluate the key sources utilized in this synthesis.)
@@ -72,23 +73,43 @@ def generate_report(topic: str, scraped_text: str, language: str, stats: dict) -
 
     model_used = "Unknown"
     report_text = ""
+    
+    # ---------------------------------------------------------
+    # GEMINI 2.5 FLASH EXECUTION WITH FORCED LOGGING
+    # ---------------------------------------------------------
+    key_last_4 = str(GEMINI_API_KEY)[-4:] if GEMINI_API_KEY else "NONE"
+    print(f"--> [INFO] Attempting Gemini 2.5 Flash API (Key ending in: {key_last_4})...", flush=True)
 
-    # Try Gemini First
+    # 🌟 Setting endpoint strictly to Gemini 2.5 Flash
     gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
     payload = {"contents": [{"parts": [{"text": prompt}]}]}
 
     try:
         response = requests.post(gemini_url, json=payload, headers={"Content-Type": "application/json"}, timeout=45)
+        
         if response.status_code == 200:
-            report_text = response.json()["candidates"][0]["content"]["parts"][0]["text"]
-            model_used = "Gemini 2.5 Flash"
+            data = response.json()
+            candidate = data.get("candidates", [{}])[0]
+            
+            if "content" in candidate:
+                report_text = candidate["content"]["parts"][0]["text"]
+                model_used = "Gemini 2.5 Flash"
+                print("--> [SUCCESS] Gemini 2.5 Flash API returned the report successfully!", flush=True)
+            else:
+                finish_reason = candidate.get("finishReason", "UNKNOWN")
+                print(f"--> [WARNING] Gemini Safety Filter Blocked Content! Finish Reason: {finish_reason}", file=sys.stderr, flush=True)
         else:
-            console.print(f"[warning]⚠ Gemini Quota/Error ({response.status_code}). Switching to NVIDIA Llama...[/warning]")
+            print(f"--> [ERROR] Gemini API Failed! Status Code: {response.status_code}", file=sys.stderr, flush=True)
+            print(f"--> [ERROR DETAILS] {response.text}", file=sys.stderr, flush=True)
+            
     except Exception as e:
-        console.print(f"[warning]⚠ Gemini Failed: {e}. Switching to NVIDIA Llama...[/warning]")
+        print(f"--> [EXCEPTION] Gemini connection error: {str(e)}", file=sys.stderr, flush=True)
 
-    # Fallback / Primary via NVIDIA Llama if Gemini failed
+    # ---------------------------------------------------------
+    # FALLBACK TO NVIDIA LLAMA
+    # ---------------------------------------------------------
     if not report_text:
+        print("--> [INFO] Falling back to NVIDIA Llama-3.1 8B...", flush=True)
         nvidia_url = "https://integrate.api.nvidia.com/v1/chat/completions"
         headers = {"Authorization": f"Bearer {NVIDIA_API_KEY}", "Content-Type": "application/json"}
         nvidia_payload = {
@@ -103,10 +124,11 @@ def generate_report(topic: str, scraped_text: str, language: str, stats: dict) -
             res.raise_for_status()
             report_text = res.json()["choices"][0]["message"]["content"]
             model_used = "NVIDIA Llama-3.1 8B"
+            print("--> [SUCCESS] NVIDIA Llama API returned the report!", flush=True)
         except Exception as e:
+            print(f"--> [CRITICAL] NVIDIA Llama also failed: {str(e)}", file=sys.stderr, flush=True)
             report_text = f"# Error Generating Report\nAll LLM synthesis failed. Details: {str(e)}"
             model_used = "Failed"
 
-    # Inject model used into the report's executive dashboard placeholder
     report_text = report_text.replace("[MODEL_TAG]", model_used)
     return report_text, model_used
