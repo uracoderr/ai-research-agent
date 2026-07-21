@@ -72,7 +72,7 @@ async def stream_research(topic: str, language: str = "english"):
             yield f"data: [PROGRESS:90]✅ Async Scraping completed! Successful sources: {scraped_count}\n\n"
             
             # Phase 4
-            yield f"data: [PROGRESS:95]▶ PHASE 4: REPORT SYNTHESIS ({language.capitalize()})...\n\n"
+            yield f"data: [PROGRESS:95]▶ PHASE 4: EXTENSIVE REPORT SYNTHESIS ({language.capitalize()})...\n\n"
             
             stats_dict = {
                 "scraped_success": scraped_count, 
@@ -81,11 +81,12 @@ async def stream_research(topic: str, language: str = "english"):
                 "llm_ranking_success": llm_success
             }
             
-            final_report = await asyncio.to_thread(
+            # 🌟 Unpacking report text and model name
+            final_report, model_used = await asyncio.to_thread(
                 generate_report, optimized_topic, scraped_data, language.capitalize(), stats_dict
             )
             llm_calls += 1
-            yield f"data: [PROGRESS:100]✅ Report generated successfully!\n\n"
+            yield f"data: [PROGRESS:100]✅ Comprehensive report generated via {model_used}!\n\n"
             
             # Save files
             safe_topic = optimized_topic.replace(' ', '_').lower()
