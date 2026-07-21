@@ -14,7 +14,7 @@ from agents.report_agent import generate_report
 
 app = FastAPI(title="AI Research Agent Web")
 
-# 🌟 Safe Absolute Paths for Render / Cloud Deployment
+# Safe Absolute Paths for Cloud Deployment
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
@@ -24,7 +24,8 @@ app.mount("/reports", StaticFiles(directory=reports_dir), name="reports")
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request, "result": None, "error": None})
+    # 🌟 Fixed TemplateResponse syntax for modern FastAPI/Starlette
+    return templates.TemplateResponse(request, "index.html", {"result": None, "error": None})
 
 @app.post("/research", response_class=HTMLResponse)
 async def run_research(request: Request, topic: str = Form(...), language: str = Form(...)):
@@ -38,8 +39,7 @@ async def run_research(request: Request, topic: str = Form(...), language: str =
         
         raw_articles = fetch_articles(optimized_topic, max_results=80)
         if not raw_articles:
-            return templates.TemplateResponse("index.html", {
-                "request": request, 
+            return templates.TemplateResponse(request, "index.html", {
                 "result": None, 
                 "error": "No articles found for this topic. Try something else."
             })
@@ -92,8 +92,7 @@ async def run_research(request: Request, topic: str = Form(...), language: str =
         # Convert report to HTML for clean browser rendering inside UI
         report_html = markdown.markdown(final_report, extensions=['tables', 'fenced_code'])
         
-        return templates.TemplateResponse("index.html", {
-            "request": request, 
+        return templates.TemplateResponse(request, "index.html", {
             "result": report_html, 
             "metrics": metrics,
             "topic": optimized_topic,
@@ -101,8 +100,7 @@ async def run_research(request: Request, topic: str = Form(...), language: str =
         })
         
     except Exception as e:
-        return templates.TemplateResponse("index.html", {
-            "request": request, 
+        return templates.TemplateResponse(request, "index.html", {
             "result": None, 
             "error": f"Pipeline Error: {str(e)}"
         })
