@@ -51,7 +51,7 @@ def filter_and_rank_articles(articles: list, top_n: int = 40) -> tuple:
     }
     
     payload = {
-        "model": "meta/llama-3.1-8b-instruct", 
+        "model": "meta/llama-3.1-70b-instruct", 
         "messages": [{"role": "user", "content": prompt}], 
         "temperature": 0.0,
         "max_tokens": 2500

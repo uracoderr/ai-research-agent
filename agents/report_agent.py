@@ -113,7 +113,7 @@ def generate_report(topic: str, scraped_text: str, language: str, stats: dict) -
         nvidia_url = "https://integrate.api.nvidia.com/v1/chat/completions"
         headers = {"Authorization": f"Bearer {NVIDIA_API_KEY}", "Content-Type": "application/json"}
         nvidia_payload = {
-            "model": "meta/llama-3.1-8b-instruct",
+            "model": "meta/llama-3.1-70b-instruct",
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.3,
             "max_tokens": 4096
