@@ -43,16 +43,14 @@ async def stream_research(topic: str, language: str = "english"):
         try:
             # Phase 0
             yield f"data: [PROGRESS:10]▶ PHASE 0: QUERY OPTIMIZATION...\n\n"
-            await asyncio.sleep(0.3)
-            optimized_topic = optimize_query(topic)
+            optimized_topic = await asyncio.to_thread(optimize_query, topic)
             llm_calls += 1
             yield f"data: [PROGRESS:20]✨ Query optimized to: '{optimized_topic}'\n\n"
             
             # Phase 1
             yield f"data: [PROGRESS:30]▶ PHASE 1: SEARCHING WEB...\n\n"
-            await asyncio.sleep(0.3)
             yield f"data: [PROGRESS:40]🔍 Tavily API fetching 80 articles...\n\n"
-            raw_articles = fetch_articles(optimized_topic, max_results=80)
+            raw_articles = await asyncio.to_thread(fetch_articles, optimized_topic, max_results=80)
             if not raw_articles:
                 yield f"data: [PROGRESS:100]❌ No articles found for this topic.\n\n"
                 return
@@ -60,20 +58,21 @@ async def stream_research(topic: str, language: str = "english"):
             
             # Phase 2
             yield f"data: [PROGRESS:60]▶ PHASE 2: CREDIBILITY RANKING (NVIDIA LLM)...\n\n"
-            await asyncio.sleep(0.3)
-            ranked_articles, duplicates_removed, filter_calls, llm_success = filter_and_rank_articles(raw_articles, top_n=40)
+            ranked_articles, duplicates_removed, filter_calls, llm_success = await asyncio.to_thread(
+                filter_and_rank_articles, raw_articles, top_n=40
+            )
             llm_calls += filter_calls
             yield f"data: [PROGRESS:70]✅ Ranking done! Top {len(ranked_articles)} high-credibility sources selected.\n\n"
             
             # Phase 3
             yield f"data: [PROGRESS:80]▶ PHASE 3: ASYNC SCRAPING (Target: 15+)...\n\n"
-            await asyncio.sleep(0.3)
-            scraped_data, scraped_count = scrape_top_articles(ranked_articles, min_required=15)
+            scraped_data, scraped_count = await asyncio.to_thread(
+                scrape_top_articles, ranked_articles, min_required=15
+            )
             yield f"data: [PROGRESS:90]✅ Async Scraping completed! Successful sources: {scraped_count}\n\n"
             
             # Phase 4
             yield f"data: [PROGRESS:95]▶ PHASE 4: REPORT SYNTHESIS ({language.capitalize()})...\n\n"
-            await asyncio.sleep(0.3)
             
             stats_dict = {
                 "scraped_success": scraped_count, 
@@ -81,8 +80,10 @@ async def stream_research(topic: str, language: str = "english"):
                 "duplicates_removed": duplicates_removed,
                 "llm_ranking_success": llm_success
             }
-            # 🌟 Properly passing user requested language (English/Hinglish/Hindi)
-            final_report = generate_report(optimized_topic, scraped_data, language.capitalize(), stats_dict)
+            
+            final_report = await asyncio.to_thread(
+                generate_report, optimized_topic, scraped_data, language.capitalize(), stats_dict
+            )
             llm_calls += 1
             yield f"data: [PROGRESS:100]✅ Report generated successfully!\n\n"
             
