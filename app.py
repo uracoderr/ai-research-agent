@@ -2,11 +2,11 @@ import os
 import time
 import markdown
 from fastapi import FastAPI, Form, Request
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 
-# Apne existing agents import kar rahe hain
+# Apne modular research agents import kar rahe hain
 from agents.search_agent import optimize_query, fetch_articles
 from agents.filter_agent import filter_and_rank_articles
 from agents.scraper_agent import scrape_top_articles
@@ -14,14 +14,17 @@ from agents.report_agent import generate_report
 
 app = FastAPI(title="AI Research Agent Web")
 
-# Templates aur reports folder setup
-templates = Jinja2Templates(directory="templates")
-os.makedirs("reports", exist_ok=True)
-app.mount("/reports", StaticFiles(directory="reports"), name="reports")
+# 🌟 Safe Absolute Paths for Render / Cloud Deployment
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
+
+reports_dir = os.path.join(BASE_DIR, "reports")
+os.makedirs(reports_dir, exist_ok=True)
+app.mount("/reports", StaticFiles(directory=reports_dir), name="reports")
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request, "result": None})
+    return templates.TemplateResponse("index.html", {"request": request, "result": None, "error": None})
 
 @app.post("/research", response_class=HTMLResponse)
 async def run_research(request: Request, topic: str = Form(...), language: str = Form(...)):
@@ -29,22 +32,26 @@ async def run_research(request: Request, topic: str = Form(...), language: str =
     llm_calls = 0
     
     try:
-        # Phase 0 & 1
+        # Phase 0 & 1: Query optimization & Search
         optimized_topic = optimize_query(topic)
         llm_calls += 1
         
         raw_articles = fetch_articles(optimized_topic, max_results=80)
         if not raw_articles:
-            return templates.TemplateResponse("index.html", {"request": request, "error": "No articles found."})
+            return templates.TemplateResponse("index.html", {
+                "request": request, 
+                "result": None, 
+                "error": "No articles found for this topic. Try something else."
+            })
             
-        # Phase 2
+        # Phase 2: Credibility Ranking via NVIDIA Llama
         ranked_articles, duplicates_removed, filter_calls, llm_success = filter_and_rank_articles(raw_articles, top_n=40)
         llm_calls += filter_calls
         
-        # Phase 3
+        # Phase 3: Async Scraping with auto-refill threshold
         scraped_data, scraped_count = scrape_top_articles(ranked_articles, min_required=15)
         
-        # Phase 4
+        # Phase 4: Gemini Report Synthesis
         stats_dict = {
             "scraped_success": scraped_count, 
             "avg_credibility": 8.5, 
@@ -54,12 +61,12 @@ async def run_research(request: Request, topic: str = Form(...), language: str =
         final_report = generate_report(optimized_topic, scraped_data, language.capitalize(), stats_dict)
         llm_calls += 1
         
-        # Save files for download
+        # Save Markdown and HTML reports locally for downloads
         safe_topic = optimized_topic.replace(' ', '_').lower()
         md_filename = os.path.join("reports", f"{safe_topic}_report.md")
         html_filename = os.path.join("reports", f"{safe_topic}_report.html")
         
-        with open(md_filename, "w", encoding="utf-8") as f:
+        with open(os.path.join(BASE_DIR, md_filename), "w", encoding="utf-8") as f:
             f.write(final_report)
             
         html_content = f"""
@@ -69,7 +76,7 @@ async def run_research(request: Request, topic: str = Form(...), language: str =
         th, td{{border: 1px solid #cbd5e1; padding: 10px; text-align: left;}} th{{background-color: #f1f5f9;}}</style>
         </head><body>{markdown.markdown(final_report, extensions=['tables'])}</body></html>
         """
-        with open(html_filename, "w", encoding="utf-8") as f:
+        with open(os.path.join(BASE_DIR, html_filename), "w", encoding="utf-8") as f:
             f.write(html_content)
             
         end_time = time.time()
@@ -82,18 +89,23 @@ async def run_research(request: Request, topic: str = Form(...), language: str =
             "html_path": f"/{html_filename}"
         }
         
-        # Convert Markdown report to HTML for sleek browser viewing
+        # Convert report to HTML for clean browser rendering inside UI
         report_html = markdown.markdown(final_report, extensions=['tables', 'fenced_code'])
         
         return templates.TemplateResponse("index.html", {
             "request": request, 
             "result": report_html, 
             "metrics": metrics,
-            "topic": optimized_topic
+            "topic": optimized_topic,
+            "error": None
         })
         
     except Exception as e:
-        return templates.TemplateResponse("index.html", {"request": request, "error": str(e)})
+        return templates.TemplateResponse("index.html", {
+            "request": request, 
+            "result": None, 
+            "error": f"Pipeline Error: {str(e)}"
+        })
 
 if __name__ == "__main__":
     import uvicorn
