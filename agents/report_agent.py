@@ -3,7 +3,7 @@ import json
 from config import console, GEMINI_API_KEY, NVIDIA_API_KEY
 
 def generate_report(topic: str, scraped_text: str, language: str, stats: dict) -> str:
-    console.print(f"\n[step]▶ PHASE 4: REPORT GENERATION (GEMINI / NVIDIA FALLBACK)[/step]")
+    console.print(f"\n[step]▶ PHASE 4: REPORT GENERATION ({language.upper()})[/step]")
     
     # Realistic Dynamic Confidence Calculation
     base_score = (stats['avg_credibility'] / 10) * 60
@@ -11,10 +11,29 @@ def generate_report(topic: str, scraped_text: str, language: str, stats: dict) -
     llm_penalty = 0 if stats['llm_ranking_success'] else 15
     confidence_score = max(50, min(98, int(base_score + volume_score - llm_penalty)))
 
+    # 🌟 Ultra-strict language instruction builder
+    lang_lower = language.lower()
+    if "hinglish" in lang_lower:
+        lang_instruction = (
+            "CRITICAL LANGUAGE RULE: You MUST write the ENTIRE report in HINGLISH. "
+            "Use ONLY Latin/Roman alphabet (English letters). "
+            "Mix conversational Hindi with technical English terms naturally "
+            "(Example style: 'Yeh report AI ke trends aur future par based hai...'). "
+            "DO NOT use Devanagari script. DO NOT write pure standard English."
+        )
+    elif "hindi" in lang_lower:
+        lang_instruction = (
+            "CRITICAL LANGUAGE RULE: You MUST write the ENTIRE report in pure HINDI "
+            "using Devanagari script (हिंदी लिपि)."
+        )
+    else:
+        lang_instruction = "Write the report in professional, high-grade English."
+
     prompt = f"""
     You are an elite Industry Analyst writing a production-grade research report in the year 2026.
     Topic: '{topic}'
-    Language strictly: {language} (If Hinglish: Use ONLY Latin/Roman alphabet, mix conversational Hindi with English tech terms. No Devanagari).
+    
+    {lang_instruction}
     
     Use the provided scraped data. Pay attention to the "Score" and "Source" of each snippet.
     
@@ -48,7 +67,7 @@ def generate_report(topic: str, scraped_text: str, language: str, stats: dict) -
     {scraped_text}
     """
 
-    # 🌟 Try Gemini First
+    # Try Gemini First
     gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
     payload = {"contents": [{"parts": [{"text": prompt}]}]}
 
@@ -61,7 +80,7 @@ def generate_report(topic: str, scraped_text: str, language: str, stats: dict) -
     except Exception as e:
         console.print(f"[warning]⚠ Gemini Connection Failed: {e}. Switching to NVIDIA Fallback...[/warning]")
 
-    # 🌟 Fallback to NVIDIA Llama if Gemini fails/quota full
+    # Fallback to NVIDIA Llama if Gemini fails/quota full
     nvidia_url = "https://integrate.api.nvidia.com/v1/chat/completions"
     headers = {"Authorization": f"Bearer {NVIDIA_API_KEY}", "Content-Type": "application/json"}
     nvidia_payload = {
