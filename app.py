@@ -1,5 +1,6 @@
 import os
 import time
+import traceback
 import markdown
 from fastapi import FastAPI, Form, Request
 from fastapi.responses import HTMLResponse
@@ -14,27 +15,34 @@ from agents.report_agent import generate_report
 
 app = FastAPI(title="AI Research Agent Web")
 
-# Safe Absolute Paths for Cloud Deployment
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
+templates_dir = os.path.join(BASE_DIR, "templates")
+
+# Debugging print for Render logs
+print(f"--- BASE_DIR: {BASE_DIR}")
+print(f"--- Templates Directory Exists: {os.path.exists(templates_dir)}")
+
+templates = Jinja2Templates(directory=templates_dir)
 
 reports_dir = os.path.join(BASE_DIR, "reports")
 os.makedirs(reports_dir, exist_ok=True)
 app.mount("/reports", StaticFiles(directory=reports_dir), name="reports")
 
-# 🌟 Universal Template Response Helper (Prevents version mismatch 500 errors)
 def render_template(request: Request, template_name: str, context: dict):
     try:
-        # New FastAPI / Starlette syntax
         return templates.TemplateResponse(request, template_name, context)
     except TypeError:
-        # Fallback for older Starlette versions
         context["request"] = request
         return templates.TemplateResponse(template_name, context)
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    return render_template(request, "index.html", {"result": None, "error": None})
+    try:
+        return render_template(request, "index.html", {"result": None, "error": None})
+    except Exception as e:
+        # 🌟 Ab agar koi error hoga toh screen par saaf-saaf dikh jayega!
+        err_msg = traceback.format_exc()
+        return HTMLResponse(content=f"<h3 style='color:red;'>Detailed Server Error:</h3><pre>{err_msg}</pre>", status_code=500)
 
 @app.post("/research", response_class=HTMLResponse)
 async def run_research(request: Request, topic: str = Form(...), language: str = Form(...)):
@@ -42,7 +50,6 @@ async def run_research(request: Request, topic: str = Form(...), language: str =
     llm_calls = 0
     
     try:
-        # Phase 0 & 1: Query optimization & Search
         optimized_topic = optimize_query(topic)
         llm_calls += 1
         
@@ -53,14 +60,11 @@ async def run_research(request: Request, topic: str = Form(...), language: str =
                 "error": "No articles found for this topic. Try something else."
             })
             
-        # Phase 2: Credibility Ranking via NVIDIA Llama
         ranked_articles, duplicates_removed, filter_calls, llm_success = filter_and_rank_articles(raw_articles, top_n=40)
         llm_calls += filter_calls
         
-        # Phase 3: Async Scraping with auto-refill threshold
         scraped_data, scraped_count = scrape_top_articles(ranked_articles, min_required=15)
         
-        # Phase 4: Gemini Report Synthesis
         stats_dict = {
             "scraped_success": scraped_count, 
             "avg_credibility": 8.5, 
@@ -70,7 +74,6 @@ async def run_research(request: Request, topic: str = Form(...), language: str =
         final_report = generate_report(optimized_topic, scraped_data, language.capitalize(), stats_dict)
         llm_calls += 1
         
-        # Save Markdown and HTML reports locally for downloads
         safe_topic = optimized_topic.replace(' ', '_').lower()
         md_filename = os.path.join("reports", f"{safe_topic}_report.md")
         html_filename = os.path.join("reports", f"{safe_topic}_report.html")
@@ -108,10 +111,8 @@ async def run_research(request: Request, topic: str = Form(...), language: str =
         })
         
     except Exception as e:
-        return render_template(request, "index.html", {
-            "result": None, 
-            "error": f"Pipeline Error: {str(e)}"
-        })
+        err_msg = traceback.format_exc()
+        return HTMLResponse(content=f"<h3 style='color:red;'>Pipeline Error Traceback:</h3><pre>{err_msg}</pre>", status_code=500)
 
 if __name__ == "__main__":
     import uvicorn
