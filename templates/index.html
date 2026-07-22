@@ -3,333 +3,294 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ThesisPilot - Your Personal Ivy-League Researcher</title>
+    <title>ThesisPilot - AI Research Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <style>
         body { word-break: break-word; overflow-wrap: break-word; }
-        #res-topic { word-break: break-word; overflow-wrap: break-word; line-height: 1.3; }
-        #report-content h1 { font-size: 1.5rem; font-weight: 800; color: #f8fafc; margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 2px solid #334155; word-break: break-word; line-height: 1.3; }
-        #report-content h2 { font-size: 1.2rem; font-weight: 700; color: #38bdf8; margin-top: 1.75rem; margin-bottom: 0.75rem; border-left: 4px solid #6366f1; padding-left: 10px; word-break: break-word; line-height: 1.3; }
-        #report-content h3 { font-size: 1.05rem; font-weight: 600; color: #cbd5e1; margin-top: 1.25rem; margin-bottom: 0.5rem; word-break: break-word; }
-        #report-content p { color: #94a3b8; line-height: 1.7; margin-bottom: 1rem; }
-        #report-content ul, #report-content ol { margin-bottom: 1rem; padding-left: 1.25rem; color: #94a3b8; }
-        #report-content li { margin-bottom: 0.4rem; line-height: 1.5; }
-        #report-content strong { color: #f1f5f9; font-weight: 600; }
-        #report-content table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.85rem; overflow-x: auto; display: block; }
-        #report-content th, #report-content td { border: 1px solid #334155; padding: 8px 12px; text-align: left; }
-        #report-content th { background-color: #1e293b; color: #f8fafc; font-weight: 600; }
-        #report-content td { background-color: #0f172a; color: #cbd5e1; }
-        #report-content blockquote { border-left: 4px solid #10b981; background: rgba(16, 185, 129, 0.05); padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 1rem 0; color: #cbd5e1; }
+        .markdown-body h1 { font-size: 1.5rem; font-weight: 800; color: #f8fafc; border-bottom: 2px solid #334155; padding-bottom: 0.5rem; margin-bottom: 1.25rem;}
+        .markdown-body h2 { font-size: 1.2rem; font-weight: 700; color: #38bdf8; margin-top: 1.75rem; margin-bottom: 0.75rem; border-left: 4px solid #6366f1; padding-left: 10px;}
+        .markdown-body h3 { font-size: 1.05rem; font-weight: 600; color: #cbd5e1; margin-top: 1.25rem; margin-bottom: 0.5rem; }
+        .markdown-body p { color: #94a3b8; line-height: 1.7; margin-bottom: 1rem; }
+        .markdown-body ul, .markdown-body ol { margin-bottom: 1rem; padding-left: 1.25rem; color: #94a3b8; }
+        .markdown-body li { margin-bottom: 0.4rem; line-height: 1.5; }
+        .markdown-body strong { color: #f1f5f9; font-weight: 600; }
+        .markdown-body table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.85rem; display: block; overflow-x: auto;}
+        .markdown-body th, .markdown-body td { border: 1px solid #334155; padding: 8px 12px; }
+        .markdown-body th { background-color: #1e293b; color: #f8fafc; }
+        .markdown-body td { background-color: #0f172a; color: #cbd5e1; }
+        /* Interactive feature tabs */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-teal-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-teal-500 selection:text-white">
 
-    <header class="border-b border-slate-800/80 px-4 py-3 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto flex items-center justify-between">
+    <header class="border-b border-slate-800/80 px-4 py-3 bg-slate-900/60 sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="p-1.5 bg-slate-800 rounded-lg border border-slate-700 shadow-sm">
-                    <span class="text-xl sm:text-2xl">🎓</span>
-                </div>
-                <div class="flex flex-col justify-center">
-                    <h1 class="text-lg sm:text-xl font-extrabold bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 bg-clip-text text-transparent drop-shadow-sm leading-tight">
-                        ThesisPilot
-                    </h1>
-                    <span class="text-[10px] sm:text-xs text-slate-400 font-medium tracking-wide mt-0.5">
-                        Your personal Ivy-League researcher.
-                    </span>
+                <span class="text-2xl bg-slate-800 p-1 rounded-md border border-slate-700">🎓</span>
+                <div>
+                    <h1 class="text-xl font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-500 bg-clip-text text-transparent">ThesisPilot</h1>
+                    <p class="text-[10px] text-slate-400 tracking-wide">Interactive Research Engine</p>
                 </div>
             </div>
-            <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium hidden sm:block">● Live V5.1</span>
+            <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full font-medium">V5.0 Connected</span>
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto w-full px-4 py-8 flex-grow flex flex-col justify-center mb-12">
-        
+    <main class="max-w-5xl mx-auto w-full px-4 py-6 flex-grow flex flex-col">
         <!-- Input Form -->
-        <div id="form-container" class="max-w-xl mx-auto w-full space-y-6 py-8">
-            <div class="text-center space-y-2">
-                <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">Automated Literature Review</h2>
-                <p class="text-slate-400 text-xs sm:text-sm">Search ➔ Rank via 70B Model ➔ Async Scraping ➔ Deep Synthesis.</p>
-            </div>
-            
-            <form id="research-form" onsubmit="startResearch(event)" class="space-y-4 bg-slate-900/80 p-6 rounded-2xl border border-slate-800 shadow-2xl">
+        <div id="form-container" class="max-w-xl mx-auto w-full space-y-6 mt-10">
+            <h2 class="text-3xl font-extrabold text-center">Autonomous Research</h2>
+            <form onsubmit="startResearch(event)" class="bg-slate-900/80 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
                 <div>
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Research Topic / Thesis Title</label>
-                    <textarea id="topic-input" required rows="3" placeholder="e.g. Digital Marketing Strategies of Zomato and Swiggy in modern food tech..." 
-                              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 text-sm focus:outline-none focus:border-teal-500 transition resize-none"></textarea>
+                    <label class="text-xs font-bold text-slate-400 uppercase">Topic</label>
+                    <input type="text" id="topic-input" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm mt-1 focus:border-teal-500 outline-none transition">
                 </div>
-                
                 <div>
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Report Output Style</label>
-                    <select id="lang-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 text-sm focus:outline-none focus:border-teal-500 transition">
-                        <option value="english">Professional English (Academic)</option>
-                        <option value="hinglish">Hinglish (Conversational)</option>
-                        <option value="hindi">Hindi (Devanagari)</option>
+                    <label class="text-xs font-bold text-slate-400 uppercase">Language</label>
+                    <select id="lang-input" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm mt-1 focus:border-teal-500 outline-none transition">
+                        <option value="english">English</option>
+                        <option value="hinglish">Hinglish</option>
+                        <option value="hindi">Hindi</option>
                     </select>
                 </div>
-                
-                <button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 font-semibold text-sm py-3 rounded-xl transition shadow-lg shadow-teal-600/20 text-white">
-                    Generate Comprehensive Report
-                </button>
+                <button type="submit" class="w-full bg-teal-600 hover:bg-teal-500 font-bold py-3 rounded-lg transition text-white shadow-lg shadow-teal-900/50">Run Deep Synthesis</button>
             </form>
         </div>
 
-        <!-- Terminal Screen -->
-        <div id="terminal-container" class="hidden space-y-4 max-w-xl mx-auto w-full py-10">
-            <div class="text-center space-y-2">
-                <h3 class="text-lg font-bold text-slate-200">Executing Autonomous Pipeline...</h3>
-                <p id="progress-status-text" class="text-xs text-teal-400 font-mono">Initializing worker nodes...</p>
+        <!-- Terminal loader -->
+        <div id="terminal-container" class="hidden max-w-xl mx-auto w-full py-10 space-y-4">
+            <h3 class="text-center font-bold text-slate-300">Pipeline Executing...</h3>
+            <p id="status-text" class="text-center text-xs text-teal-400 font-mono"></p>
+            <div class="w-full bg-slate-900 rounded-full h-2">
+                <div id="progress-bar" class="bg-teal-400 h-2 rounded-full transition-all duration-300" style="width:0%"></div>
             </div>
-
-            <div class="w-full bg-slate-900 rounded-full h-3 p-0.5 border border-slate-800 shadow-inner">
-                <div id="progress-bar-fill" class="bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-400 h-2 rounded-full transition-all duration-300" style="width: 5%;"></div>
-            </div>
-            <div class="flex justify-between text-xs text-slate-400 font-mono font-semibold">
-                <span>Progress</span>
-                <span id="progress-pct">5%</span>
-            </div>
-            
-            <div id="terminal-logs" class="bg-black font-mono text-[11px] text-emerald-400 p-4 rounded-xl h-44 overflow-y-auto border border-slate-800 shadow-2xl space-y-1.5 whitespace-pre-wrap">
-                <p class="text-slate-500">[SYSTEM] Secure connection established...</p>
-            </div>
+            <div id="logs" class="bg-black text-[10px] text-emerald-400 p-4 rounded-xl h-40 overflow-y-auto border border-slate-800 whitespace-pre-wrap font-mono"></div>
         </div>
 
         <!-- Result Dashboard -->
-        <div id="result-container" class="hidden space-y-6 py-4">
-            
-            <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl flex flex-col lg:flex-row items-center justify-between gap-4 shadow-lg">
-                <div class="w-full lg:w-auto truncate">
-                    <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Active Topic</span>
-                    <h3 id="res-topic" class="text-base font-bold text-white capitalize truncate"></h3>
+        <div id="result-container" class="hidden w-full space-y-6">
+            <!-- Controls & Top Stats -->
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-wrap gap-4 items-center justify-between">
+                <div>
+                    <span class="text-[10px] text-slate-500 uppercase font-bold">Topic</span>
+                    <h3 id="res-topic" class="text-lg font-bold text-white capitalize"></h3>
                 </div>
-                
-                <div class="flex items-center space-x-2 bg-slate-950 px-3 py-2 rounded-xl border border-slate-800 w-full lg:w-auto justify-center">
-                    <span class="text-[10px] text-slate-400 font-semibold uppercase whitespace-nowrap">Font: <span id="font-val" class="text-teal-400 font-bold">100</span>%</span>
-                    <input type="range" min="50" max="150" value="100" step="5" oninput="changeFontSize(this.value)" class="w-24 accent-teal-500 cursor-pointer">
-                </div>
-
-                <div class="flex flex-wrap items-center justify-center gap-2 w-full lg:w-auto">
-                    <button id="podcast-btn" onclick="startPodcastMode()" class="bg-amber-500 hover:bg-amber-400 text-xs px-3 py-2 rounded-xl font-bold transition text-black shadow-lg shadow-amber-500/20 flex items-center space-x-1">
-                        <span>🎙️ Podcast Mode</span>
-                    </button>
-                    
-                    <a id="download-md" href="#" download class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-xl font-medium transition border border-slate-700 text-slate-300">.md</a>
-                    <a id="download-html" href="#" download class="bg-teal-600 hover:bg-teal-500 text-xs px-3 py-2 rounded-xl font-medium transition text-white">.html</a>
-                    <button onclick="location.reload()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-xl font-medium transition border border-slate-700 text-slate-300">New Topic</button>
+                <div class="flex gap-2">
+                    <button onclick="location.reload()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-lg transition">New Topic</button>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                <div class="bg-slate-900/60 border border-slate-800/80 p-3 rounded-xl shadow-sm">
-                    <span class="text-[10px] text-slate-400 block uppercase font-semibold">Time Taken</span>
-                    <span id="m-time" class="text-sm font-bold text-teal-400"></span>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Main Report (2/3 width) -->
+                <div class="lg:col-span-2 bg-slate-900 border border-slate-800 p-6 rounded-xl shadow-lg h-[600px] overflow-y-auto">
+                    <div id="report-content" class="markdown-body"></div>
                 </div>
-                <div class="bg-slate-900/60 border border-slate-800/80 p-3 rounded-xl shadow-sm">
-                    <span class="text-[10px] text-slate-400 block uppercase font-semibold">LLM Calls</span>
-                    <span id="m-calls" class="text-sm font-bold text-teal-400"></span>
-                </div>
-                <div class="bg-slate-900/60 border border-slate-800/80 p-3 rounded-xl shadow-sm">
-                    <span class="text-[10px] text-slate-400 block uppercase font-semibold">Raw Fetched</span>
-                    <span id="m-fetched" class="text-sm font-bold text-teal-400"></span>
-                </div>
-                <div class="bg-slate-900/60 border border-slate-800/80 p-3 rounded-xl shadow-sm">
-                    <span class="text-[10px] text-slate-400 block uppercase font-semibold">Scraped Success</span>
-                    <span id="m-scraped" class="text-sm font-bold text-emerald-400"></span>
-                </div>
-            </div>
-            
-            <div id="podcast-ui" class="hidden bg-slate-950 border border-amber-500/50 p-4 rounded-xl shadow-xl shadow-amber-500/10">
-                <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
-                    <span class="text-amber-400 font-bold text-sm flex items-center gap-2">
-                        <span class="animate-pulse">🔴</span> LIVE AI PODCAST
-                    </span>
-                    <button onclick="stopPodcast()" class="text-xs bg-red-600 hover:bg-red-500 px-3 py-1 rounded-md text-white font-bold transition">Stop Audio</button>
-                </div>
-                <div id="podcast-subtitles" class="text-sm font-medium text-slate-300 min-h-[60px] leading-relaxed">
-                    <span class="text-slate-500 italic">🧠 AI is analyzing the report and writing the podcast script... (takes ~5 seconds)</span>
-                </div>
-            </div>
 
-            <div class="bg-slate-900/90 border border-slate-800 p-6 sm:p-10 rounded-2xl shadow-2xl overflow-hidden">
-                <div id="report-content" class="transition-all duration-150" style="font-size: 15px;">
+                <!-- Interactive Tools (1/3 width) -->
+                <div class="lg:col-span-1 space-y-4">
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                        <h4 class="font-bold text-teal-400 mb-4 border-b border-slate-800 pb-2">🛠 Interactive Tools</h4>
+                        
+                        <div class="flex flex-col gap-3">
+                            <button onclick="openTab('podcast-tab'); startPodcastMode();" class="bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 border border-amber-500/30 p-3 rounded-lg text-sm font-bold flex justify-between">
+                                <span>🎙️ Podcast Mode</span> <span class="text-xs opacity-70">Listen</span>
+                            </button>
+                            <button onclick="openTab('mindmap-tab'); generateMindmap();" class="bg-cyan-500/10 text-cyan-500 hover:bg-cyan-500/20 border border-cyan-500/30 p-3 rounded-lg text-sm font-bold flex justify-between">
+                                <span>🧠 Mindmap Generator</span> <span class="text-xs opacity-70">Visualize</span>
+                            </button>
+                            <button onclick="openTab('rag-tab')" class="bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border border-emerald-500/30 p-3 rounded-lg text-sm font-bold flex justify-between">
+                                <span>💬 Instant RAG</span> <span class="text-xs opacity-70">Ask</span>
+                            </button>
+                            <button onclick="openTab('challenge-tab')" class="bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/30 p-3 rounded-lg text-sm font-bold flex justify-between">
+                                <span>⚔️ Challenge Report</span> <span class="text-xs opacity-70">Debate</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Tool Viewport -->
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 h-[350px] overflow-y-auto relative shadow-inner">
+                        
+                        <!-- Empty State -->
+                        <div id="empty-tab" class="tab-content active text-center text-slate-500 text-sm mt-20">
+                            Select a tool above to interact with the research data.
+                        </div>
+
+                        <!-- Podcast Tab -->
+                        <div id="podcast-tab" class="tab-content space-y-4">
+                            <div class="flex justify-between items-center">
+                                <h5 class="font-bold text-amber-500 text-sm">🔴 Live AI Script</h5>
+                                <button onclick="stopPodcast()" class="text-xs bg-red-600/20 text-red-400 px-2 py-1 rounded">Stop</button>
+                            </div>
+                            <div id="podcast-box" class="text-sm text-slate-300 leading-relaxed italic">Generating script...</div>
+                        </div>
+
+                        <!-- Mindmap Tab -->
+                        <div id="mindmap-tab" class="tab-content">
+                            <h5 class="font-bold text-cyan-500 text-sm mb-2">Architectural Mindmap</h5>
+                            <div id="mindmap-box" class="text-xs text-slate-400">Drawing...</div>
+                        </div>
+
+                        <!-- RAG Tab -->
+                        <div id="rag-tab" class="tab-content h-full flex flex-col">
+                            <h5 class="font-bold text-emerald-500 text-sm mb-2">Query Scraped Sources</h5>
+                            <div id="rag-chat" class="flex-grow overflow-y-auto space-y-3 mb-3 text-sm pr-1"></div>
+                            <div class="flex gap-2">
+                                <input type="text" id="rag-input" placeholder="Ask something..." class="flex-grow bg-slate-900 border border-slate-700 rounded-md px-3 py-2 text-sm outline-none">
+                                <button onclick="sendRAG()" class="bg-emerald-600 px-3 rounded-md font-bold text-sm">Ask</button>
+                            </div>
+                        </div>
+
+                        <!-- Challenge Tab -->
+                        <div id="challenge-tab" class="tab-content h-full flex flex-col">
+                            <h5 class="font-bold text-red-500 text-sm mb-2">Debate the Findings</h5>
+                            <div id="challenge-chat" class="flex-grow overflow-y-auto space-y-3 mb-3 text-sm pr-1"></div>
+                            <div class="flex gap-2">
+                                <input type="text" id="challenge-input" placeholder="I disagree because..." class="flex-grow bg-slate-900 border border-slate-700 rounded-md px-3 py-2 text-sm outline-none">
+                                <button onclick="sendChallenge()" class="bg-red-600 px-3 rounded-md font-bold text-sm">Send</button>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
-
     </main>
 
-    <footer class="text-center py-6 text-[11px] text-slate-500 border-t border-slate-900 mt-12 mb-6">
-        Built with Llama-3.1 70B and Gemini. Your private research engine.
-    </footer>
-
     <script>
-        function changeFontSize(val) {
-            document.getElementById('font-val').innerText = val;
-            document.getElementById('report-content').style.fontSize = val + '%';
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+        let currentTopic = "";
+
+        function openTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
         }
 
-        let podcastScript = [];
-        let currentLine = 0;
-        let isPodcastPlaying = false;
-
-        async function startPodcastMode() {
-            const reportText = document.getElementById('report-content').innerText;
-            if (!reportText) return;
-
-            document.getElementById('podcast-ui').classList.remove('hidden');
-            document.getElementById('podcast-subtitles').innerHTML = `<span class="text-slate-500 italic">🧠 AI is generating the podcast script and initializing voices...</span>`;
-            document.getElementById('podcast-btn').disabled = true;
-            document.getElementById('podcast-btn').classList.add('opacity-50', 'cursor-not-allowed');
-
-            try {
-                const response = await fetch('/generate-podcast', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ report_text: reportText })
-                });
-                
-                const data = await response.json();
-                if (data.error) throw new Error(data.error);
-                
-                podcastScript = data.script;
-                currentLine = 0;
-                isPodcastPlaying = true;
-                playNextPodcastLine();
-                
-            } catch (error) {
-                document.getElementById('podcast-subtitles').innerHTML = `<span class="text-red-400">❌ Failed to generate podcast: ${error.message}</span>`;
-                resetPodcastBtn();
-            }
-        }
-
-        function playNextPodcastLine() {
-            if (!isPodcastPlaying || currentLine >= podcastScript.length) {
-                stopPodcast();
-                return;
-            }
-
-            const line = podcastScript[currentLine];
-            const subtitleBox = document.getElementById('podcast-subtitles');
-            
-            const speakerColor = line.speaker.includes('A') ? 'text-teal-400' : 'text-emerald-400';
-            subtitleBox.innerHTML = `<strong class="${speakerColor}">${line.speaker}:</strong> <span class="text-white">${line.text}</span>`;
-
-            const utterance = new SpeechSynthesisUtterance(line.text);
-            const voices = window.speechSynthesis.getVoices();
-            
-            const voiceA = voices.find(v => v.lang.includes('en') && v.name.includes('Female')) || voices.find(v => v.lang.includes('en-US')) || voices[0];
-            const voiceB = voices.find(v => v.lang.includes('en') && (v.name.includes('Male') || v.name.includes('Google UK'))) || voices.find(v => v.lang.includes('en-GB')) || voices.reverse()[0];
-
-            utterance.voice = line.speaker.includes('A') ? voiceA : voiceB;
-            utterance.rate = 1.05; 
-            utterance.pitch = line.speaker.includes('A') ? 1.1 : 0.9;
-
-            utterance.onend = () => {
-                currentLine++;
-                playNextPodcastLine();
-            };
-
-            window.speechSynthesis.speak(utterance);
-        }
-
-        function stopPodcast() {
-            isPodcastPlaying = false;
-            window.speechSynthesis.cancel();
-            document.getElementById('podcast-ui').classList.add('hidden');
-            resetPodcastBtn();
-        }
-
-        function resetPodcastBtn() {
-            const btn = document.getElementById('podcast-btn');
-            btn.disabled = false;
-            btn.classList.remove('opacity-50', 'cursor-not-allowed');
-        }
-
-        window.onbeforeunload = function() { if (window.speechSynthesis) window.speechSynthesis.cancel(); };
-
+        // --- Core Research Engine SSE ---
         function startResearch(event) {
             event.preventDefault();
             const topic = document.getElementById('topic-input').value;
-            const language = document.getElementById('lang-input').value;
-
+            const lang = document.getElementById('lang-input').value;
+            
             document.getElementById('form-container').classList.add('hidden');
             document.getElementById('terminal-container').classList.remove('hidden');
-
-            const terminalLogs = document.getElementById('terminal-logs');
-            const progressBarFill = document.getElementById('progress-bar-fill');
-            const progressPct = document.getElementById('progress-pct');
-            const progressStatusText = document.getElementById('progress-status-text');
-
-            terminalLogs.innerHTML = `<p class="text-teal-400">[info] 🚀 Booting ThesisPilot engine for '${topic}'...</p>`;
-
-            const eventSource = new EventSource(`/stream-research?topic=${encodeURIComponent(topic)}&language=${encodeURIComponent(language)}`);
-
-            eventSource.onmessage = function(event) {
-                const rawData = event.data;
-                let pct = 10;
-                let cleanData = rawData;
-                
-                if (rawData.startsWith("[PROGRESS:")) {
-                    const match = rawData.match(/\[PROGRESS:(\d+)\](.*)/);
+            
+            const logs = document.getElementById('logs');
+            const pBar = document.getElementById('progress-bar');
+            const sText = document.getElementById('status-text');
+            
+            const evtSource = new EventSource(`/stream-research?topic=${encodeURIComponent(topic)}&language=${lang}`);
+            
+            evtSource.onmessage = function(e) {
+                let data = e.data;
+                if (data.startsWith("[PROGRESS:")) {
+                    const match = data.match(/\[PROGRESS:(\d+)\](.*)/);
                     if (match) {
-                        pct = parseInt(match[1]);
-                        cleanData = match[2].trim();
+                        pBar.style.width = match[1] + '%';
+                        sText.innerText = match[2];
+                        logs.innerHTML += `<div>${match[2]}</div>`;
+                        logs.scrollTop = logs.scrollHeight;
                     }
-                }
-
-                progressBarFill.style.width = pct + '%';
-                progressPct.innerText = pct + '%';
-                progressStatusText.innerText = cleanData;
-
-                if (cleanData.startsWith("{")) {
+                } else if (data.startsWith("{")) {
                     try {
-                        const packet = JSON.parse(cleanData);
-                        if (packet.status === "done") {
-                            eventSource.close();
-                            
-                            document.getElementById('res-topic').innerText = packet.topic;
-                            document.getElementById('download-md').href = packet.metrics.md_path;
-                            document.getElementById('download-html').href = packet.metrics.html_path;
-                            
-                            document.getElementById('m-time').innerText = packet.metrics.time + 's';
-                            document.getElementById('m-calls').innerText = packet.metrics.calls;
-                            document.getElementById('m-fetched').innerText = packet.metrics.fetched;
-                            document.getElementById('m-scraped').innerText = packet.metrics.scraped;
-                            
-                            document.getElementById('report-content').innerHTML = packet.report;
-
-                            setTimeout(() => {
-                                document.getElementById('terminal-container').classList.add('hidden');
-                                document.getElementById('result-container').classList.remove('hidden');
-                            }, 500);
-                            return;
+                        const json = JSON.parse(data);
+                        if (json.status === "done") {
+                            evtSource.close();
+                            currentTopic = json.metrics.safe_topic;
+                            document.getElementById('res-topic').innerText = json.topic;
+                            document.getElementById('report-content').innerHTML = json.report;
+                            document.getElementById('terminal-container').classList.add('hidden');
+                            document.getElementById('result-container').classList.remove('hidden');
                         }
-                    } catch (e) {}
+                    } catch(err) {}
                 }
-
-                let formattedLog = cleanData
-                    .replace('[step]', '🚀 ')
-                    .replace('[/step]', '')
-                    .replace('[info]', 'ℹ️ ')
-                    .replace('[/info]', '')
-                    .replace('[success]', '✅ ')
-                    .replace('[/success]', '')
-                    .replace('[highlight]', '💡 ')
-                    .replace('[/highlight]', '')
-                    .replace('[error]', '❌ ')
-                    .replace('[/error]', '');
-
-                const p = document.createElement('p');
-                p.textContent = formattedLog;
-                terminalLogs.appendChild(p);
-                terminalLogs.scrollTop = terminalLogs.scrollHeight;
-            };
-
-            eventSource.onerror = function(err) {
-                terminalLogs.innerHTML += `<p class="text-red-400">❌ Connection timeout. Background synthesis might still be running.</p>`;
-                eventSource.close();
             };
         }
+
+        // --- Interactive API Calls ---
+        async function startPodcastMode() {
+            const report = document.getElementById('report-content').innerText;
+            const box = document.getElementById('podcast-box');
+            box.innerHTML = "Generating script...";
+            
+            try {
+                const res = await fetch('/generate-podcast', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({report_text: report})
+                });
+                const data = await res.json();
+                if (data.script) playPodcastStream(data.script, box);
+                else box.innerHTML = "<span class='text-red-400'>Error generating podcast</span>";
+            } catch (e) { box.innerHTML = e.message; }
+        }
+
+        let podcastPlaying = false;
+        function playPodcastStream(scriptArr, box) {
+            podcastPlaying = true;
+            let i = 0;
+            function playNext() {
+                if (!podcastPlaying || i >= scriptArr.length) return;
+                const line = scriptArr[i];
+                const color = line.speaker.includes('A') ? 'text-teal-400' : 'text-emerald-400';
+                box.innerHTML = `<strong class="${color}">${line.speaker}:</strong> <span class="text-white">${line.text}</span>`;
+                
+                const utt = new SpeechSynthesisUtterance(line.text);
+                utt.rate = 1.05;
+                utt.pitch = line.speaker.includes('A') ? 1.1 : 0.9;
+                utt.onend = () => { i++; playNext(); };
+                window.speechSynthesis.speak(utt);
+            }
+            playNext();
+        }
+        function stopPodcast() { podcastPlaying = false; window.speechSynthesis.cancel(); }
+
+        async function generateMindmap() {
+            const box = document.getElementById('mindmap-box');
+            box.innerHTML = "Synthesizing diagram (takes ~5s)...";
+            const report = document.getElementById('report-content').innerText;
+            
+            try {
+                const res = await fetch('/generate-diagram', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({report_text: report})
+                });
+                const data = await res.json();
+                if (data.mermaid) {
+                    box.innerHTML = `<div class="mermaid">${data.mermaid}</div>`;
+                    mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+                } else box.innerHTML = "Error generating diagram.";
+            } catch (e) { box.innerHTML = e.message; }
+        }
+
+        async function handleChat(endpoint, inputId, boxId, userColor, aiColor) {
+            const input = document.getElementById(inputId);
+            const box = document.getElementById(boxId);
+            const query = input.value.trim();
+            if(!query) return;
+            
+            input.value = "";
+            box.innerHTML += `<div class="${userColor} text-right bg-slate-800 p-2 rounded ml-6">${query}</div>`;
+            box.innerHTML += `<div id="typing-${boxId}" class="${aiColor} bg-slate-950 p-2 rounded mr-6 border border-slate-800">Thinking...</div>`;
+            box.scrollTop = box.scrollHeight;
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({topic: currentTopic, query: query})
+                });
+                const data = await res.json();
+                document.getElementById(`typing-${boxId}`).remove();
+                box.innerHTML += `<div class="${aiColor} bg-slate-950 p-2 rounded mr-6 border border-slate-800 markdown-body" style="font-size:0.85rem">${data.answer || data.error}</div>`;
+            } catch (e) {
+                document.getElementById(`typing-${boxId}`).innerText = "Error contacting API.";
+            }
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function sendRAG() { handleChat('/ask-rag', 'rag-input', 'rag-chat', 'text-white', 'text-emerald-300'); }
+        function sendChallenge() { handleChat('/challenge-report', 'challenge-input', 'challenge-chat', 'text-white', 'text-red-300'); }
     </script>
 </body>
 </html>

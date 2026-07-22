@@ -8,7 +8,8 @@ custom_theme = Theme({
     "warning": "bold yellow",
     "error": "bold red",
     "step": "bold magenta",
-    "highlight": "bold yellow"
+    "highlight": "bold yellow",
+    "interactive": "bold cyan"  # New tag for interactive features
 })
 
 console = Console(theme=custom_theme)

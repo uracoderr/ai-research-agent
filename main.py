@@ -10,7 +10,7 @@ from agents.report_agent import generate_report
 
 def main():
     console.print("\n[success]======================================================[/success]")
-    console.print("[success] 🚀 PRODUCTION GRADE AI RESEARCH AGENT (V3.0 FINAL) [/success]")
+    console.print("[success] 🚀 THESISPILOT AI RESEARCH AGENT (V5.0 FINAL) [/success]")
     console.print("[success]======================================================[/success]\n")
     
     raw_query = Prompt.ask("[step]Kis topic par deep research karni hai?[/step]")
@@ -29,7 +29,7 @@ def main():
     raw_articles = fetch_articles(topic, max_results=80)
     if not raw_articles: return
         
-    # Phase 2 (🌟 Fixed unpacking for 4 return values)
+    # Phase 2
     ranked_articles, duplicates_removed, filter_calls, llm_success = filter_and_rank_articles(raw_articles, top_n=40)
     llm_calls += filter_calls
     
@@ -43,7 +43,9 @@ def main():
         "duplicates_removed": duplicates_removed,
         "llm_ranking_success": llm_success
     }
-    final_report = generate_report(topic, scraped_data, language, stats_dict)
+    
+    # Updated to receive model_used from the new report_agent logic
+    final_report, model_used = generate_report(topic, scraped_data, language, stats_dict)
     llm_calls += 1
     
     # Save Outputs
@@ -51,9 +53,14 @@ def main():
     safe_topic = topic.replace(' ', '_').lower()
     md_filename = os.path.join("reports", f"{safe_topic}_report.md")
     html_filename = os.path.join("reports", f"{safe_topic}_report.html")
+    context_filename = os.path.join("reports", f"{safe_topic}_context.txt")
     
+    # Saving Markdown, HTML, and Raw Context (For RAG)
     with open(md_filename, "w", encoding="utf-8") as f: f.write(final_report)
-    with open(html_filename, "w", encoding="utf-8") as f: f.write(f"<html><head><meta charset='utf-8'><style>body{{font-family: sans-serif; max-width: 900px; margin: 40px auto; line-height: 1.6;}} table{{border-collapse: collapse; width: 100%;}} th, td{{border: 1px solid #ddd; padding: 8px;}}</style></head><body>{markdown.markdown(final_report, extensions=['tables'])}</body></html>")
+    with open(context_filename, "w", encoding="utf-8") as f: f.write(scraped_data)
+    with open(html_filename, "w", encoding="utf-8") as f: 
+        html_body = markdown.markdown(final_report, extensions=['tables'])
+        f.write(f"<html><head><meta charset='utf-8'><title>{topic}</title><style>body{{font-family: sans-serif; max-width: 900px; margin: 40px auto; line-height: 1.6;}} table{{border-collapse: collapse; width: 100%;}} th, td{{border: 1px solid #ddd; padding: 8px;}}</style></head><body>{html_body}</body></html>")
     
     # Pipeline Metrics Dashboard
     end_time = time.time()
@@ -65,12 +72,14 @@ def main():
     console.print(f"[info]  Raw Fetched      :[/info] {len(raw_articles)}")
     console.print(f"[info]  Spam/Dupes Dropped:[/info] {duplicates_removed}")
     console.print(f"[info]  Successful Scrapes:[/info] {scraped_count}")
-    console.print(f"[info]  LLM Ranking Engine:[/info] {'Active (Success)' if llm_success else 'Fallback Mode'}")
+    console.print(f"[info]  Synthesis Model  :[/info] {model_used}")
     console.print("[step]============================================[/step]")
     
     console.print(f"\n[success]🎉 BOOM! Research Complete![/success]")
-    console.print(f"[info]📄 Markdown File: {md_filename}[/info]")
-    console.print(f"[info]🌐 HTML Export:   {html_filename}[/info]")
+    console.print(f"[info]📄 Markdown File : {md_filename}[/info]")
+    console.print(f"[info]🌐 HTML Export   : {html_filename}[/info]")
+    console.print(f"[interactive]🧠 Raw Context   : {context_filename} (Ready for RAG/CLI)[/interactive]")
+    console.print(f"\n[interactive]💡 Pro Tip: Run `python app.py` to use Podcast, Mindmap, and RAG in the Web UI![/interactive]\n")
 
 if __name__ == "__main__":
     main()

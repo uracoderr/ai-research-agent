@@ -6,4 +6,4 @@ requests==2.31.0
 beautifulsoup4==4.12.3
 markdown==3.5.2
 rich==13.7.0
-
+pydantic>=2.0.0
