@@ -64,7 +64,7 @@ def filter_and_rank_articles(articles: list, top_n: int = 40) -> tuple:
         try:
             console.print(f"[info]🧠 LLM Ranking (Attempt {attempt}/{max_retries})...[/info]")
             
-            response = requests.post(api_url, headers=headers, json=payload, timeout=600)
+            response = requests.post(api_url, headers=headers, json=payload, timeout=1600)
             response.raise_for_status()
             reply = response.json()["choices"][0]["message"]["content"]
             
