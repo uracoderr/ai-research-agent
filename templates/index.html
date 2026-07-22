@@ -26,8 +26,6 @@
 
     <header class="border-b border-slate-800/80 px-4 py-3 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
         <div class="max-w-4xl mx-auto flex items-center justify-between">
-            
-            <!-- Rebranded Header -->
             <div class="flex items-center gap-3">
                 <div class="p-1.5 bg-slate-800 rounded-lg border border-slate-700 shadow-sm">
                     <span class="text-xl sm:text-2xl">🎓</span>
@@ -41,13 +39,11 @@
                     </span>
                 </div>
             </div>
-            <!-- Version Tag -->
-            <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium hidden sm:block">● Live V5.0</span>
-            
+            <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium hidden sm:block">● Live V5.1</span>
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto w-full px-4 py-6 flex-grow flex flex-col justify-center">
+    <main class="max-w-4xl mx-auto w-full px-4 py-8 flex-grow flex flex-col justify-center mb-12">
         
         <!-- Input Form -->
         <div id="form-container" class="max-w-xl mx-auto w-full space-y-6 py-8">
@@ -59,7 +55,10 @@
             <form id="research-form" onsubmit="startResearch(event)" class="space-y-4 bg-slate-900/80 p-6 rounded-2xl border border-slate-800 shadow-2xl">
                 <div>
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Research Topic / Thesis Title</label>
-                    <textarea id="topic-input" required rows="3" placeholder="e.g. Digital Marketing Strategies of Zomato and Swiggy in modern food tech..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 text-sm focus:outline-none focus:border-teal-500 transition resize-none"></textarea>
+                    <textarea id="topic-input" required rows="3" placeholder="e.g. Digital Marketing Strategies of Zomato and Swiggy in modern food tech..." 
+                              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 text-sm focus:outline-none focus:border-teal-500 transition resize-none"></textarea>
+                </div>
+                
                 <div>
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Report Output Style</label>
                     <select id="lang-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 text-sm focus:outline-none focus:border-teal-500 transition">
@@ -75,7 +74,7 @@
             </form>
         </div>
 
-        <!-- 🌟 Live Progress Bar & Terminal Screen -->
+        <!-- Terminal Screen -->
         <div id="terminal-container" class="hidden space-y-4 max-w-xl mx-auto w-full py-10">
             <div class="text-center space-y-2">
                 <h3 class="text-lg font-bold text-slate-200">Executing Autonomous Pipeline...</h3>
@@ -98,7 +97,6 @@
         <!-- Result Dashboard -->
         <div id="result-container" class="hidden space-y-6 py-4">
             
-            <!-- Controls Bar -->
             <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl flex flex-col lg:flex-row items-center justify-between gap-4 shadow-lg">
                 <div class="w-full lg:w-auto truncate">
                     <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Active Topic</span>
@@ -111,7 +109,6 @@
                 </div>
 
                 <div class="flex flex-wrap items-center justify-center gap-2 w-full lg:w-auto">
-                    <!-- 🎙️ Podcast Mode Button -->
                     <button id="podcast-btn" onclick="startPodcastMode()" class="bg-amber-500 hover:bg-amber-400 text-xs px-3 py-2 rounded-xl font-bold transition text-black shadow-lg shadow-amber-500/20 flex items-center space-x-1">
                         <span>🎙️ Podcast Mode</span>
                     </button>
@@ -122,7 +119,6 @@
                 </div>
             </div>
 
-            <!-- Stats Grid -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
                 <div class="bg-slate-900/60 border border-slate-800/80 p-3 rounded-xl shadow-sm">
                     <span class="text-[10px] text-slate-400 block uppercase font-semibold">Time Taken</span>
@@ -142,7 +138,6 @@
                 </div>
             </div>
             
-            <!-- 🎙️ Live Podcast UI Box (Hidden initially) -->
             <div id="podcast-ui" class="hidden bg-slate-950 border border-amber-500/50 p-4 rounded-xl shadow-xl shadow-amber-500/10">
                 <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
                     <span class="text-amber-400 font-bold text-sm flex items-center gap-2">
@@ -155,7 +150,6 @@
                 </div>
             </div>
 
-            <!-- Main Report Content -->
             <div class="bg-slate-900/90 border border-slate-800 p-6 sm:p-10 rounded-2xl shadow-2xl overflow-hidden">
                 <div id="report-content" class="transition-all duration-150" style="font-size: 15px;">
                 </div>
@@ -164,19 +158,16 @@
 
     </main>
 
-    <footer class="text-center py-6 text-[11px] text-slate-500 border-t border-slate-900 mt-12">
+    <footer class="text-center py-6 text-[11px] text-slate-500 border-t border-slate-900 mt-12 mb-6">
         Built with Llama-3.1 70B and Gemini. Your private research engine.
     </footer>
 
-    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // --- UI Logic ---
         function changeFontSize(val) {
             document.getElementById('font-val').innerText = val;
             document.getElementById('report-content').style.fontSize = val + '%';
         }
 
-        // --- Podcast Logic ---
         let podcastScript = [];
         let currentLine = 0;
         let isPodcastPlaying = false;
@@ -185,7 +176,6 @@
             const reportText = document.getElementById('report-content').innerText;
             if (!reportText) return;
 
-            // UI Updates
             document.getElementById('podcast-ui').classList.remove('hidden');
             document.getElementById('podcast-subtitles').innerHTML = `<span class="text-slate-500 italic">🧠 AI is generating the podcast script and initializing voices...</span>`;
             document.getElementById('podcast-btn').disabled = true;
@@ -221,15 +211,12 @@
             const line = podcastScript[currentLine];
             const subtitleBox = document.getElementById('podcast-subtitles');
             
-            // Visual Update
             const speakerColor = line.speaker.includes('A') ? 'text-teal-400' : 'text-emerald-400';
             subtitleBox.innerHTML = `<strong class="${speakerColor}">${line.speaker}:</strong> <span class="text-white">${line.text}</span>`;
 
-            // Setup Speech
             const utterance = new SpeechSynthesisUtterance(line.text);
             const voices = window.speechSynthesis.getVoices();
             
-            // Assign Voices (Attempt to get distinct voices)
             const voiceA = voices.find(v => v.lang.includes('en') && v.name.includes('Female')) || voices.find(v => v.lang.includes('en-US')) || voices[0];
             const voiceB = voices.find(v => v.lang.includes('en') && (v.name.includes('Male') || v.name.includes('Google UK'))) || voices.find(v => v.lang.includes('en-GB')) || voices.reverse()[0];
 
@@ -258,10 +245,8 @@
             btn.classList.remove('opacity-50', 'cursor-not-allowed');
         }
 
-        // Cancel speech if user navigates away
         window.onbeforeunload = function() { if (window.speechSynthesis) window.speechSynthesis.cancel(); };
 
-        // --- Core Research Engine Logic (SSE) ---
         function startResearch(event) {
             event.preventDefault();
             const topic = document.getElementById('topic-input').value;
@@ -292,7 +277,6 @@
                     }
                 }
 
-                // Progress Bar Update
                 progressBarFill.style.width = pct + '%';
                 progressPct.innerText = pct + '%';
                 progressStatusText.innerText = cleanData;
@@ -323,7 +307,6 @@
                     } catch (e) {}
                 }
 
-                // Format terminal logs
                 let formattedLog = cleanData
                     .replace('[step]', '🚀 ')
                     .replace('[/step]', '')
