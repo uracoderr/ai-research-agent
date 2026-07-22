@@ -1,40 +1,52 @@
 import requests
 import json
-import sys
+import re
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from config import console, NVIDIA_API_KEY
 
-def call_nvidia_api(prompt: str, max_tokens: int = 4000, temp: float = 0.4):
-    url = "https://integrate.api.nvidia.com/v1/chat/completions".strip("() '\"")
+# 🚀 FIX 1: Added Model Selection & Retry Logic
+def call_nvidia_api(prompt: str, max_tokens: int = 4000, temp: float = 0.4, model: str = "meta/llama-3.1-70b-instruct", retries: int = 2):
+    url = "[https://integrate.api.nvidia.com/v1/chat/completions](https://integrate.api.nvidia.com/v1/chat/completions)".strip("() '\"")
     headers = {"Authorization": f"Bearer {NVIDIA_API_KEY}", "Content-Type": "application/json"}
     payload = {
-        "model": "meta/llama-3.1-70b-instruct",
+        "model": model,
         "messages": [
-            {"role": "system", "content": "You are a senior academic research professor. Write extremely detailed, deep, and exhaustive content."},
+            {"role": "system", "content": "You are an elite academic researcher. Always output exactly what is asked. No introductory filler text."},
             {"role": "user", "content": prompt}
         ],
         "temperature": temp,
         "max_tokens": max_tokens
     }
-    try:
-        response = requests.post(url, json=payload, headers=headers, timeout=300)
-        response.raise_for_status()
-        return response.json()["choices"][0]["message"]["content"]
-    except Exception as e:
-        return f"Error generating section: {str(e)}"
+    
+    for attempt in range(retries):
+        try:
+            response = requests.post(url, json=payload, headers=headers, timeout=120)
+            if response.status_code == 429: # Rate limit hit
+                time.sleep(2 * (attempt + 1))
+                continue
+            response.raise_for_status()
+            return response.json()["choices"][0]["message"]["content"]
+        except Exception as e:
+            if attempt == retries - 1:
+                return f"[API Error or Rate Limit after {retries} attempts: {str(e)}]"
+            time.sleep(2)
 
-def generate_section(title, prompt_desc, topic, scraped_text):
+def generate_section(title, prompt_desc, topic, scraped_text, delay):
+    time.sleep(delay) # 🚀 FIX 2: Staggering to prevent API blocking
     prompt = f"""
     Write an exhaustive, deeply detailed research section titled '{title}' for the topic: '{topic}'.
     Instructions: {prompt_desc}
-    Use the following scraped data thoroughly with specific facts and details:
-    {scraped_text[:15000]}
+    Use the following scraped data thoroughly with specific facts, numbers, and details. Do NOT summarize, expand deeply!
+    Data:
+    {scraped_text[:12000]}
     """
-    content = call_nvidia_api(prompt, max_tokens=3000, temp=0.4)
+    # Using 70B for the main report for high quality
+    content = call_nvidia_api(prompt, max_tokens=3500, temp=0.5, model="meta/llama-3.1-70b-instruct")
     return title, content
 
 def generate_report(topic: str, scraped_text: str, language: str, stats: dict) -> tuple:
-    console.print(f"\n[step]▶ PHASE 4: PARALLEL EXHAUSTIVE REPORT GENERATION ({language.upper()})[/step]")
+    console.print(f"\n[step]▶ PHASE 4: STAGGERED PARALLEL REPORT GENERATION ({language.upper()})[/step]")
     
     base_score = (stats['avg_credibility'] / 10) * 60
     volume_score = min(30, (stats['scraped_success'] / 15) * 30)
@@ -50,58 +62,70 @@ def generate_report(topic: str, scraped_text: str, language: str, stats: dict) -
         lang_instruction = "Write in professional, exhaustive academic English."
 
     sections_config = [
-        ("📑 Executive Summary & Macro Landscape", f"Provide a lengthy, highly detailed breakdown of the core landscape and macro shifts. {lang_instruction}"),
-        ("🔬 Comprehensive Technical & Market Architecture", f"Provide an exhaustive deep-dive analysis breaking down core pillars, technical innovations, and market drivers. {lang_instruction}"),
-        ("📈 Granular Opportunity, Challenge & Risk Matrix", f"Provide an extensive breakdown contrasting high-growth commercial opportunities against systemic risks. {lang_instruction}"),
-        ("🚀 Long-term Strategic Predictions & 5-Year Roadmap", f"Provide detailed chronological timelines, predictive modeling, and strategic advice. {lang_instruction}")
+        ("📊 Executive Summary & Macro Landscape", f"Provide a lengthy, highly detailed breakdown of the core landscape and macro shifts. {lang_instruction}", 0),
+        ("⚙️ Comprehensive Technical & Market Architecture", f"Provide an exhaustive deep-dive analysis breaking down core pillars, technical innovations, and market drivers. {lang_instruction}", 2),
+        ("⚠️ Granular Opportunity, Challenge & Risk Matrix", f"Provide an extensive breakdown contrasting high-growth commercial opportunities against systemic risks. {lang_instruction}", 4),
+        ("🔮 Long-term Strategic Predictions & 5-Year Roadmap", f"Provide detailed chronological timelines, predictive modeling, and strategic advice. {lang_instruction}", 6)
     ]
 
-    print("--> [INFO] Launching Parallel Section Generators via Llama-3.1 70B...", flush=True)
+    print("--> [INFO] Launching Smart Parallel Section Generators (Staggered)...", flush=True)
     
     results = {}
     with ThreadPoolExecutor(max_workers=4) as executor:
-        futures = {executor.submit(generate_section, title, desc, topic, scraped_text): title for title, desc in sections_config}
+        # We pass the delay to stagger the API calls
+        futures = {executor.submit(generate_section, title, desc, topic, scraped_text, delay): title for title, desc, delay in sections_config}
         for future in as_completed(futures):
             title, content = future.result()
             results[title] = content
             print(f"--> [SUCCESS] Section '{title}' completed!", flush=True)
 
-    # Compile Final Report
-    report_text = f"# {topic.title()} - Comprehensive Industry Intelligence Report 2026\n\n"
-    report_text += "## 📊 Executive Dashboard\n"
+    report_text = f"# {topic.title()} - Comprehensive Industry Intelligence Report\n\n"
+    report_text += "## 🎯 Executive Dashboard\n"
     report_text += f"- **Confidence Score:** {confidence_score}%\n"
     report_text += f"- **Sources Processed:** {stats['scraped_success']}\n"
     report_text += f"- **Avg Credibility:** {stats['avg_credibility']}/10\n"
-    report_text += "- **Synthesis Model:** NVIDIA Llama-3.1 70B (Parallel Engine)\n\n"
+    report_text += "- **Synthesis Model:** Llama-3.1 70B (Staggered Engine)\n\n"
 
-    for title, _ in sections_config:
+    # Assemble in order
+    for title, _, _ in sections_config:
         report_text += f"\n## {title}\n"
         report_text += results.get(title, "Section generation failed.") + "\n"
 
-    report_text += "\n## 📚 Weighted Sources & Credibility Breakdown\n"
-    report_text += f"This report synthesized data from {stats['scraped_success']} verified high-credibility web sources with an average score of {stats['avg_credibility']}/10.\n"
-
     return report_text, "NVIDIA Llama-3.1 70B (Parallel)"
 
-# --- INTERACTIVE FEATURES ---
+# --- 🚀 FIX 3: BULLETPROOF INTERACTIVE FEATURES (Using 8B Model for Speed) ---
+
 def generate_podcast_script(report_text: str):
-    prompt = f"Convert this report into an engaging 2-person podcast script (Host A and Expert B) as a JSON array: [{{\"speaker\": \"Host A\", \"text\": \"...\"}}]. Report: {report_text[:8000]}"
-    res = call_nvidia_api(prompt, max_tokens=2000, temp=0.2)
+    prompt = f"Convert this report into a fun 2-person podcast script. \nRETURN STRICTLY A JSON ARRAY. No explanations.\nFormat: [{{\"speaker\": \"Host A\", \"text\": \"...\"}}]\nReport: {report_text[:8000]}"
+    # Switch to 8B for fast JSON generation
+    res = call_nvidia_api(prompt, max_tokens=2000, temp=0.2, model="meta/llama-3.1-8b-instruct")
     try:
-        res = res.replace("```json", "").replace("```", "").strip()
-        start, end = res.find('['), res.rfind(']')
-        return json.loads(res[start:end+1])
+        # Robust Regex to find JSON array even if LLM adds garbage text around it
+        json_match = re.search(r'\[\s*\{.*?\}\s*\]', res, re.DOTALL)
+        if json_match:
+            return json.loads(json_match.group(0))
+        return [{"speaker": "System", "text": "Sorry, failed to generate script properly."}]
     except:
-        return [{"speaker": "System", "text": "Failed to parse podcast script."}]
+        return [{"speaker": "System", "text": "JSON Parsing Error."}]
 
 def generate_diagram(report_text: str):
-    prompt = f"Create a detailed Mermaid.js flowchart ('graph TD') summarizing core pillars of this report. Return ONLY valid Mermaid code without markdown blocks. Report: {report_text[:8000]}"
-    return call_nvidia_api(prompt, max_tokens=1000, temp=0.1).replace("```mermaid", "").replace("```", "").strip()
+    prompt = f"Create a detailed Mermaid.js flowchart ('graph TD') summarizing this report. \nRETURN STRICTLY MERMAID CODE. NO MARKDOWN. NO EXPLANATIONS.\nReport: {report_text[:8000]}"
+    # Switch to 8B
+    res = call_nvidia_api(prompt, max_tokens=1000, temp=0.1, model="meta/llama-3.1-8b-instruct")
+    
+    # Robust cleanup for Mermaid
+    clean_code = res.replace("```mermaid", "").replace("```", "").strip()
+    # Remove any line that isn't part of the graph (in case LLM says "Here is the code:")
+    lines = clean_code.split('\n')
+    valid_lines = [line for line in lines if not line.lower().startswith('here') and not line.lower().startswith('sure')]
+    return "\n".join(valid_lines)
 
 def rag_query(context: str, query: str):
-    prompt = f"Answer based strictly on context: {context[:30000]}\nQuestion: {query}"
-    return call_nvidia_api(prompt, max_tokens=1000, temp=0.2)
+    prompt = f"Answer this query based ONLY on the context provided.\nContext: {context[:20000]}\nQuestion: {query}"
+    # 8B for fast chatting
+    return call_nvidia_api(prompt, max_tokens=1000, temp=0.2, model="meta/llama-3.1-8b-instruct")
 
 def challenge_query(context: str, query: str):
-    prompt = f"Defend or critique based on context: {context[:30000]}\nChallenge: {query}"
-    return call_nvidia_api(prompt, max_tokens=1500, temp=0.3)
+    prompt = f"Act as a critical debater. Defend or critique this claim based on the context.\nContext: {context[:20000]}\nChallenge: {query}"
+    # 8B for fast chatting
+    return call_nvidia_api(prompt, max_tokens=1500, temp=0.3, model="meta/llama-3.1-8b-instruct")
