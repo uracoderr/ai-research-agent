@@ -19,15 +19,16 @@
         .markdown-body th, .markdown-body td { border: 1px solid #334155; padding: 8px 12px; }
         .markdown-body th { background-color: #1e293b; color: #f8fafc; }
         .markdown-body td { background-color: #0f172a; color: #cbd5e1; }
-        /* Interactive feature tabs */
+        
+        /* Strict Tab Management to prevent overlapping */
         .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        .tab-content.active { display: flex; flex-direction: column; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-teal-500 selection:text-white">
 
     <header class="border-b border-slate-800/80 px-4 py-3 bg-slate-900/60 sticky top-0 z-50">
-        <div class="max-w-5xl mx-auto flex items-center justify-between">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <span class="text-2xl bg-slate-800 p-1 rounded-md border border-slate-700">🎓</span>
                 <div>
@@ -39,7 +40,7 @@
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto w-full px-4 py-6 flex-grow flex flex-col">
+    <main class="max-w-6xl mx-auto w-full px-4 py-6 flex-grow flex flex-col">
         <!-- Input Form -->
         <div id="form-container" class="max-w-xl mx-auto w-full space-y-6 mt-10">
             <h2 class="text-3xl font-extrabold text-center">Autonomous Research</h2>
@@ -75,7 +76,7 @@
             <!-- Controls & Top Stats -->
             <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-wrap gap-4 items-center justify-between">
                 <div>
-                    <span class="text-[10px] text-slate-500 uppercase font-bold">Topic</span>
+                    <span class="text-[10px] text-slate-500 uppercase font-bold">Active Topic</span>
                     <h3 id="res-topic" class="text-lg font-bold text-white capitalize"></h3>
                 </div>
                 <div class="flex gap-2">
@@ -83,73 +84,73 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                 <!-- Main Report (2/3 width) -->
-                <div class="lg:col-span-2 bg-slate-900 border border-slate-800 p-6 rounded-xl shadow-lg h-[600px] overflow-y-auto">
+                <div class="lg:col-span-2 bg-slate-900 border border-slate-800 p-6 rounded-xl shadow-lg max-h-[750px] overflow-y-auto">
                     <div id="report-content" class="markdown-body"></div>
                 </div>
 
                 <!-- Interactive Tools (1/3 width) -->
-                <div class="lg:col-span-1 space-y-4">
+                <div class="lg:col-span-1 space-y-4 sticky top-20">
                     <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
-                        <h4 class="font-bold text-teal-400 mb-4 border-b border-slate-800 pb-2">🛠 Interactive Tools</h4>
+                        <h4 class="font-bold text-teal-400 mb-3 border-b border-slate-800 pb-2 text-sm">🛠 Interactive Tools</h4>
                         
-                        <div class="flex flex-col gap-3">
-                            <button onclick="openTab('podcast-tab'); startPodcastMode();" class="bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 border border-amber-500/30 p-3 rounded-lg text-sm font-bold flex justify-between">
-                                <span>🎙️ Podcast Mode</span> <span class="text-xs opacity-70">Listen</span>
+                        <div class="flex flex-col gap-2.5">
+                            <button onclick="openTab('podcast-tab'); startPodcastMode();" class="bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 border border-amber-500/30 p-2.5 rounded-lg text-xs font-bold flex justify-between items-center">
+                                <span>🎙️ Podcast Mode</span> <span class="opacity-70">Listen</span>
                             </button>
-                            <button onclick="openTab('mindmap-tab'); generateMindmap();" class="bg-cyan-500/10 text-cyan-500 hover:bg-cyan-500/20 border border-cyan-500/30 p-3 rounded-lg text-sm font-bold flex justify-between">
-                                <span>🧠 Mindmap Generator</span> <span class="text-xs opacity-70">Visualize</span>
+                            <button onclick="openTab('mindmap-tab'); generateMindmap();" class="bg-cyan-500/10 text-cyan-500 hover:bg-cyan-500/20 border border-cyan-500/30 p-2.5 rounded-lg text-xs font-bold flex justify-between items-center">
+                                <span>🧠 Mindmap Generator</span> <span class="opacity-70">Visualize</span>
                             </button>
-                            <button onclick="openTab('rag-tab')" class="bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border border-emerald-500/30 p-3 rounded-lg text-sm font-bold flex justify-between">
-                                <span>💬 Instant RAG</span> <span class="text-xs opacity-70">Ask</span>
+                            <button onclick="openTab('rag-tab')" class="bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border border-emerald-500/30 p-2.5 rounded-lg text-xs font-bold flex justify-between items-center">
+                                <span>💬 Instant RAG</span> <span class="opacity-70">Ask</span>
                             </button>
-                            <button onclick="openTab('challenge-tab')" class="bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/30 p-3 rounded-lg text-sm font-bold flex justify-between">
-                                <span>⚔️ Challenge Report</span> <span class="text-xs opacity-70">Debate</span>
+                            <button onclick="openTab('challenge-tab')" class="bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/30 p-2.5 rounded-lg text-xs font-bold flex justify-between items-center">
+                                <span>⚔️ Challenge Report</span> <span class="opacity-70">Debate</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Dynamic Tool Viewport -->
-                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 h-[350px] overflow-y-auto relative shadow-inner">
+                    <!-- Dynamic Tool Viewport (Static Height & Non-overlapping) -->
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 h-[350px] flex flex-col overflow-hidden relative shadow-inner">
                         
                         <!-- Empty State -->
-                        <div id="empty-tab" class="tab-content active text-center text-slate-500 text-sm mt-20">
+                        <div id="empty-tab" class="tab-content active h-full justify-center items-center text-center text-slate-500 text-xs">
                             Select a tool above to interact with the research data.
                         </div>
 
                         <!-- Podcast Tab -->
-                        <div id="podcast-tab" class="tab-content space-y-4">
-                            <div class="flex justify-between items-center">
-                                <h5 class="font-bold text-amber-500 text-sm">🔴 Live AI Script</h5>
-                                <button onclick="stopPodcast()" class="text-xs bg-red-600/20 text-red-400 px-2 py-1 rounded">Stop</button>
+                        <div id="podcast-tab" class="tab-content h-full flex-col space-y-3">
+                            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                                <h5 class="font-bold text-amber-500 text-xs">🔴 Live AI Script</h5>
+                                <button onclick="stopPodcast()" class="text-[10px] bg-red-600/20 text-red-400 px-2 py-0.5 rounded">Stop</button>
                             </div>
-                            <div id="podcast-box" class="text-sm text-slate-300 leading-relaxed italic">Generating script...</div>
+                            <div id="podcast-box" class="text-xs text-slate-300 leading-relaxed italic overflow-y-auto flex-grow">Generating script...</div>
                         </div>
 
                         <!-- Mindmap Tab -->
-                        <div id="mindmap-tab" class="tab-content">
-                            <h5 class="font-bold text-cyan-500 text-sm mb-2">Architectural Mindmap</h5>
-                            <div id="mindmap-box" class="text-xs text-slate-400">Drawing...</div>
+                        <div id="mindmap-tab" class="tab-content h-full flex-col">
+                            <h5 class="font-bold text-cyan-500 text-xs mb-2 border-b border-slate-800 pb-2">Architectural Mindmap</h5>
+                            <div id="mindmap-box" class="text-xs text-slate-400 overflow-auto flex-grow">Drawing...</div>
                         </div>
 
                         <!-- RAG Tab -->
-                        <div id="rag-tab" class="tab-content h-full flex flex-col">
-                            <h5 class="font-bold text-emerald-500 text-sm mb-2">Query Scraped Sources</h5>
-                            <div id="rag-chat" class="flex-grow overflow-y-auto space-y-3 mb-3 text-sm pr-1"></div>
-                            <div class="flex gap-2">
-                                <input type="text" id="rag-input" placeholder="Ask something..." class="flex-grow bg-slate-900 border border-slate-700 rounded-md px-3 py-2 text-sm outline-none">
-                                <button onclick="sendRAG()" class="bg-emerald-600 px-3 rounded-md font-bold text-sm">Ask</button>
+                        <div id="rag-tab" class="tab-content h-full flex-col">
+                            <h5 class="font-bold text-emerald-500 text-xs mb-2 border-b border-slate-800 pb-2">Query Scraped Sources</h5>
+                            <div id="rag-chat" class="flex-grow overflow-y-auto space-y-2 mb-2 text-xs pr-1"></div>
+                            <div class="flex gap-2 mt-auto">
+                                <input type="text" id="rag-input" placeholder="Ask something..." class="flex-grow bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 text-xs outline-none">
+                                <button onclick="sendRAG()" class="bg-emerald-600 px-3 rounded font-bold text-xs">Ask</button>
                             </div>
                         </div>
 
                         <!-- Challenge Tab -->
-                        <div id="challenge-tab" class="tab-content h-full flex flex-col">
-                            <h5 class="font-bold text-red-500 text-sm mb-2">Debate the Findings</h5>
-                            <div id="challenge-chat" class="flex-grow overflow-y-auto space-y-3 mb-3 text-sm pr-1"></div>
-                            <div class="flex gap-2">
-                                <input type="text" id="challenge-input" placeholder="I disagree because..." class="flex-grow bg-slate-900 border border-slate-700 rounded-md px-3 py-2 text-sm outline-none">
-                                <button onclick="sendChallenge()" class="bg-red-600 px-3 rounded-md font-bold text-sm">Send</button>
+                        <div id="challenge-tab" class="tab-content h-full flex-col">
+                            <h5 class="font-bold text-red-500 text-xs mb-2 border-b border-slate-800 pb-2">Debate the Findings</h5>
+                            <div id="challenge-chat" class="flex-grow overflow-y-auto space-y-2 mb-2 text-xs pr-1"></div>
+                            <div class="flex gap-2 mt-auto">
+                                <input type="text" id="challenge-input" placeholder="I disagree because..." class="flex-grow bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 text-xs outline-none">
+                                <button onclick="sendChallenge()" class="bg-red-600 px-3 rounded font-bold text-xs">Send</button>
                             </div>
                         </div>
 
@@ -168,7 +169,6 @@
             document.getElementById(tabId).classList.add('active');
         }
 
-        // --- Core Research Engine SSE ---
         function startResearch(event) {
             event.preventDefault();
             const topic = document.getElementById('topic-input').value;
@@ -209,7 +209,6 @@
             };
         }
 
-        // --- Interactive API Calls ---
         async function startPodcastMode() {
             const report = document.getElementById('report-content').innerText;
             const box = document.getElementById('podcast-box');
@@ -248,7 +247,7 @@
 
         async function generateMindmap() {
             const box = document.getElementById('mindmap-box');
-            box.innerHTML = "Synthesizing diagram (takes ~5s)...";
+            box.innerHTML = "Synthesizing diagram...";
             const report = document.getElementById('report-content').innerText;
             
             try {
@@ -271,8 +270,8 @@
             if(!query) return;
             
             input.value = "";
-            box.innerHTML += `<div class="${userColor} text-right bg-slate-800 p-2 rounded ml-6">${query}</div>`;
-            box.innerHTML += `<div id="typing-${boxId}" class="${aiColor} bg-slate-950 p-2 rounded mr-6 border border-slate-800">Thinking...</div>`;
+            box.innerHTML += `<div class="${userColor} text-right bg-slate-800 p-1.5 rounded ml-6 text-xs">${query}</div>`;
+            box.innerHTML += `<div id="typing-${boxId}" class="${aiColor} bg-slate-950 p-1.5 rounded mr-6 border border-slate-800 text-xs">Thinking...</div>`;
             box.scrollTop = box.scrollHeight;
 
             try {
@@ -282,7 +281,7 @@
                 });
                 const data = await res.json();
                 document.getElementById(`typing-${boxId}`).remove();
-                box.innerHTML += `<div class="${aiColor} bg-slate-950 p-2 rounded mr-6 border border-slate-800 markdown-body" style="font-size:0.85rem">${data.answer || data.error}</div>`;
+                box.innerHTML += `<div class="${aiColor} bg-slate-950 p-1.5 rounded mr-6 border border-slate-800 markdown-body text-xs" style="font-size:0.75rem">${data.answer || data.error}</div>`;
             } catch (e) {
                 document.getElementById(`typing-${boxId}`).innerText = "Error contacting API.";
             }
