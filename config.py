@@ -9,12 +9,11 @@ custom_theme = Theme({
     "error": "bold red",
     "step": "bold magenta",
     "highlight": "bold yellow",
-    "interactive": "bold cyan"  # New tag for interactive features
+    "interactive": "bold cyan"
 })
 
 console = Console(theme=custom_theme)
 
-# API Keys (Yahan apni actual API keys daalna)
+# API Keys (Gemini Completely Removed)
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY", "your_tavily_key_here")
 NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY", "your_nvidia_key_here")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "your_gemini_key_here")
