@@ -25,7 +25,8 @@ def filter_and_rank_articles(articles: list, top_n: int = 20) -> tuple:
     social_dropped = len(articles) - len(clean_articles)
     
     input_data = [{"i": i, "u": a.get("url"), "t": a.get("title", "")[:80]} for i, a in enumerate(clean_articles)]
-    prompt = f"Return ONLY a raw JSON array format: [{{\"i\": 0, "s": \"Source\", "c": 9}}]. Data: {json.dumps(input_data)}"
+    prompt = f'Return ONLY a raw JSON array format: [{{"i": 0, "s": "Source", "c": 9}}]. Data: {json.dumps(input_data)}'
+
 
     url = "https://integrate.api.nvidia.com/v1/chat/completions".strip("() '\"")
     headers = {"Authorization": f"Bearer {NVIDIA_API_KEY}", "Content-Type": "application/json"}
