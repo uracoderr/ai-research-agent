@@ -12,7 +12,7 @@ def call_gemini_api(prompt: str, json_mode: bool = False):
         payload["generationConfig"] = {"responseMimeType": "application/json"}
         
     try:
-        response = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=450)
+        response = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=1450)
         if response.status_code == 200:
             return response.json().get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
         return f"Error: API returned status {response.status_code}"
