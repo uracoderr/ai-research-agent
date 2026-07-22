@@ -50,31 +50,38 @@ async def stream_research(topic: str, language: str = "english"):
         start_time = time.time()
         llm_calls = 0
         try:
+            # Phase 0
             yield f"data: [PROGRESS:10]▶ PHASE 0: QUERY OPTIMIZATION...\n\n"
             optimized_topic = await asyncio.to_thread(optimize_query, topic)
             llm_calls += 1
             yield f"data: [PROGRESS:20]✨ Query optimized to: '{optimized_topic}'\n\n"
             
+            # Phase 1 - Changed to 20 articles limit
             yield f"data: [PROGRESS:30]▶ PHASE 1: SEARCHING WEB...\n\n"
-            raw_articles = await asyncio.to_thread(fetch_articles, optimized_topic, max_results=80)
+            yield f"data: [PROGRESS:40]🔍 Tavily API fetching 20 articles...\n\n"
+            await asyncio.sleep(0.5)
+            raw_articles = await asyncio.to_thread(fetch_articles, optimized_topic, max_results=20)
             if not raw_articles:
                 yield f"data: [PROGRESS:100]❌ No articles found for this topic.\n\n"
                 return
             yield f"data: [PROGRESS:50]✅ Fetched {len(raw_articles)} raw articles successfully!\n\n"
             
+            # Phase 2 - Ranking limit adjusted to top 20
             yield f"data: [PROGRESS:60]▶ PHASE 2: CREDIBILITY RANKING...\n\n"
             ranked_articles, duplicates_removed, filter_calls, llm_success = await asyncio.to_thread(
-                filter_and_rank_articles, raw_articles, top_n=40
+                filter_and_rank_articles, raw_articles, top_n=20
             )
             llm_calls += filter_calls
             yield f"data: [PROGRESS:70]✅ Ranking done! High-credibility sources selected.\n\n"
             
-            yield f"data: [PROGRESS:80]▶ PHASE 3: ASYNC SCRAPING (Target: 15+)...\n\n"
+            # Phase 3 - Scrape target adjusted to 10
+            yield f"data: [PROGRESS:80]▶ PHASE 3: ASYNC SCRAPING (Target: 10+)...\n\n"
             scraped_data, scraped_count = await asyncio.to_thread(
-                scrape_top_articles, ranked_articles, min_required=15
+                scrape_top_articles, ranked_articles, min_required=10
             )
             yield f"data: [PROGRESS:90]✅ Async Scraping completed! Sources: {scraped_count}\n\n"
             
+            # Phase 4 - Synthesis
             yield f"data: [PROGRESS:95]▶ PHASE 4: EXTENSIVE REPORT SYNTHESIS...\n\n"
             stats_dict = {
                 "scraped_success": scraped_count, 
@@ -100,7 +107,7 @@ async def stream_research(topic: str, language: str = "english"):
             with open(os.path.join(BASE_DIR, context_filename), "w", encoding="utf-8") as f:
                 f.write(scraped_data) # SAVING CONTEXT FOR RAG & CHALLENGE
                 
-            html_content = f"<html><head><meta charset='utf-8'><title>{optimized_topic}</title></head><body>{markdown.markdown(final_report, extensions=['tables'])}</body></html>"
+            html_content = f"<html><head><meta charset='utf-8'><title>{optimized_topic}</title><style>body{{font-family: sans-serif; max-width: 900px; margin: 40px auto; line-height: 1.6;}} table{{border-collapse: collapse; width: 100%;}} th, td{{border: 1px solid #ddd; padding: 8px;}}</style></head><body>{markdown.markdown(final_report, extensions=['tables'])}</body></html>"
             with open(os.path.join(BASE_DIR, html_filename), "w", encoding="utf-8") as f:
                 f.write(html_content)
                 

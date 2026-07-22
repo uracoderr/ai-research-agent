@@ -24,7 +24,7 @@ def optimize_query(query: str) -> str:
         console.print(f"[warning]⚠ Query optimization failed, using raw query. ({str(e)})[/warning]")
         return query
 
-def fetch_articles(query: str, max_results: int = 80) -> list:
+def fetch_articles(query: str, max_results: int = 20) -> list:
     console.print(f"\n[step]▶ PHASE 1: SEARCHING WEB[/step]")
     console.print(f"[info]🔍 Tavily API se '{query}' ke liye {max_results} articles fetch kar rahe hain...[/info]")
     

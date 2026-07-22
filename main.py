@@ -26,15 +26,15 @@ def main():
     topic = optimize_query(raw_query)
     llm_calls += 1
     
-    raw_articles = fetch_articles(topic, max_results=80)
+    raw_articles = fetch_articles(topic, max_results=20)
     if not raw_articles: return
         
     # Phase 2
-    ranked_articles, duplicates_removed, filter_calls, llm_success = filter_and_rank_articles(raw_articles, top_n=40)
+    ranked_articles, duplicates_removed, filter_calls, llm_success = filter_and_rank_articles(raw_articles, top_n=20)
     llm_calls += filter_calls
     
     # Phase 3
-    scraped_data, scraped_count = scrape_top_articles(ranked_articles, min_required=15)
+    scraped_data, scraped_count = scrape_top_articles(ranked_articles, min_required=10)
     
     # Phase 4
     stats_dict = {
