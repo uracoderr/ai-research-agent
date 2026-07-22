@@ -20,9 +20,20 @@
         .markdown-body th { background-color: #1e293b; color: #f8fafc; }
         .markdown-body td { background-color: #0f172a; color: #cbd5e1; }
         
-        /* Strict Tab Management to prevent overlapping */
+        /* Strict Tab Management */
         .tab-content { display: none; }
         .tab-content.active { display: flex; flex-direction: column; }
+
+        /* Shimmer Animation for Progress Bar so it never looks stuck */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .progress-shimmer {
+            background: linear-gradient(90deg, #0d9488 0%, #2dd4bf 50%, #0d9488 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite linear;
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-teal-500 selection:text-white">
@@ -46,48 +57,67 @@
             <h2 class="text-3xl font-extrabold text-center">Autonomous Research</h2>
             <form onsubmit="startResearch(event)" class="bg-slate-900/80 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase">Topic</label>
-                    <input type="text" id="topic-input" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm mt-1 focus:border-teal-500 outline-none transition">
+                    <label class="text-xs font-bold text-slate-400 uppercase">Research Topic (Multi-line supported)</label>
+                    <!-- Square Textarea to prevent text cutting and support 2-3 lines -->
+                    <textarea id="topic-input" rows="3" required placeholder="e.g. Feasibility of Self-Healing Concrete and future infrastructure impacts in 2026..." 
+                              class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm mt-1 focus:border-teal-500 outline-none transition resize-none"></textarea>
                 </div>
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase">Language</label>
-                    <select id="lang-input" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-sm mt-1 focus:border-teal-500 outline-none transition">
+                    <select id="lang-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm mt-1 focus:border-teal-500 outline-none transition">
                         <option value="english">English</option>
                         <option value="hinglish">Hinglish</option>
                         <option value="hindi">Hindi</option>
                     </select>
                 </div>
-                <button type="submit" class="w-full bg-teal-600 hover:bg-teal-500 font-bold py-3 rounded-lg transition text-white shadow-lg shadow-teal-900/50">Run Deep Synthesis</button>
+                <button type="submit" class="w-full bg-teal-600 hover:bg-teal-500 font-bold py-3 rounded-xl transition text-white shadow-lg shadow-teal-900/50">Run Deep Synthesis</button>
             </form>
         </div>
 
-        <!-- Terminal loader -->
+        <!-- Terminal loader with smooth animated progress bar -->
         <div id="terminal-container" class="hidden max-w-xl mx-auto w-full py-10 space-y-4">
             <h3 class="text-center font-bold text-slate-300">Pipeline Executing...</h3>
-            <p id="status-text" class="text-center text-xs text-teal-400 font-mono"></p>
-            <div class="w-full bg-slate-900 rounded-full h-2">
-                <div id="progress-bar" class="bg-teal-400 h-2 rounded-full transition-all duration-300" style="width:0%"></div>
+            <p id="status-text" class="text-center text-xs text-teal-400 font-mono">Initializing agents...</p>
+            
+            <div class="w-full bg-slate-900 rounded-full h-3 p-0.5 border border-slate-800">
+                <div id="progress-bar" class="progress-shimmer h-2 rounded-full transition-all duration-500" style="width:5%"></div>
             </div>
+            <div class="flex justify-between text-xs text-slate-400 font-mono">
+                <span>Progress</span>
+                <span id="progress-pct">5%</span>
+            </div>
+
             <div id="logs" class="bg-black text-[10px] text-emerald-400 p-4 rounded-xl h-40 overflow-y-auto border border-slate-800 whitespace-pre-wrap font-mono"></div>
         </div>
 
         <!-- Result Dashboard -->
         <div id="result-container" class="hidden w-full space-y-6">
-            <!-- Controls & Top Stats -->
+            <!-- Controls & Top Stats with Zoom & Downloads -->
             <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-wrap gap-4 items-center justify-between">
                 <div>
                     <span class="text-[10px] text-slate-500 uppercase font-bold">Active Topic</span>
-                    <h3 id="res-topic" class="text-lg font-bold text-white capitalize"></h3>
+                    <h3 id="res-topic" class="text-base font-bold text-white capitalize"></h3>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="location.reload()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-lg transition">New Topic</button>
+
+                <!-- Text Zoom Option (50% to 150%) -->
+                <div class="flex items-center space-x-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+                    <span class="text-[10px] text-slate-400 font-semibold uppercase">Zoom: <span id="zoom-val" class="text-teal-400 font-bold">100</span>%</span>
+                    <input type="range" min="50" max="150" value="100" step="5" oninput="changeZoom(this.value)" class="w-20 accent-teal-500 cursor-pointer">
+                </div>
+
+                <!-- Download Options (.md, .html, PDF via print) & New Topic -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <a id="download-md" href="#" download class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-lg font-medium transition border border-slate-700 text-slate-300">.md</a>
+                    <a id="download-html" href="#" download class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-lg font-medium transition border border-slate-700 text-slate-300">.html</a>
+                    <button onclick="window.print()" class="bg-teal-600/20 text-teal-400 hover:bg-teal-600/30 border border-teal-500/30 text-xs px-3 py-2 rounded-lg font-medium transition">PDF</button>
+                    <button onclick="location.reload()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-lg transition border border-slate-700 text-slate-300">New Topic</button>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-                <!-- Main Report (2/3 width) -->
+                <!-- Main Report (2/3 width, Static non-floating text) -->
                 <div class="lg:col-span-2 bg-slate-900 border border-slate-800 p-6 rounded-xl shadow-lg max-h-[750px] overflow-y-auto">
-                    <div id="report-content" class="markdown-body"></div>
+                    <div id="report-content" class="markdown-body transition-all duration-150" style="font-size: 15px;"></div>
                 </div>
 
                 <!-- Interactive Tools (1/3 width) -->
@@ -111,15 +141,12 @@
                         </div>
                     </div>
 
-                    <!-- Dynamic Tool Viewport (Static Height & Non-overlapping) -->
+                    <!-- Dynamic Tool Viewport -->
                     <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 h-[350px] flex flex-col overflow-hidden relative shadow-inner">
-                        
-                        <!-- Empty State -->
                         <div id="empty-tab" class="tab-content active h-full justify-center items-center text-center text-slate-500 text-xs">
                             Select a tool above to interact with the research data.
                         </div>
 
-                        <!-- Podcast Tab -->
                         <div id="podcast-tab" class="tab-content h-full flex-col space-y-3">
                             <div class="flex justify-between items-center border-b border-slate-800 pb-2">
                                 <h5 class="font-bold text-amber-500 text-xs">🔴 Live AI Script</h5>
@@ -128,13 +155,11 @@
                             <div id="podcast-box" class="text-xs text-slate-300 leading-relaxed italic overflow-y-auto flex-grow">Generating script...</div>
                         </div>
 
-                        <!-- Mindmap Tab -->
                         <div id="mindmap-tab" class="tab-content h-full flex-col">
                             <h5 class="font-bold text-cyan-500 text-xs mb-2 border-b border-slate-800 pb-2">Architectural Mindmap</h5>
                             <div id="mindmap-box" class="text-xs text-slate-400 overflow-auto flex-grow">Drawing...</div>
                         </div>
 
-                        <!-- RAG Tab -->
                         <div id="rag-tab" class="tab-content h-full flex-col">
                             <h5 class="font-bold text-emerald-500 text-xs mb-2 border-b border-slate-800 pb-2">Query Scraped Sources</h5>
                             <div id="rag-chat" class="flex-grow overflow-y-auto space-y-2 mb-2 text-xs pr-1"></div>
@@ -144,7 +169,6 @@
                             </div>
                         </div>
 
-                        <!-- Challenge Tab -->
                         <div id="challenge-tab" class="tab-content h-full flex-col">
                             <h5 class="font-bold text-red-500 text-xs mb-2 border-b border-slate-800 pb-2">Debate the Findings</h5>
                             <div id="challenge-chat" class="flex-grow overflow-y-auto space-y-2 mb-2 text-xs pr-1"></div>
@@ -153,7 +177,6 @@
                                 <button onclick="sendChallenge()" class="bg-red-600 px-3 rounded font-bold text-xs">Send</button>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -169,6 +192,11 @@
             document.getElementById(tabId).classList.add('active');
         }
 
+        function changeZoom(val) {
+            document.getElementById('zoom-val').innerText = val;
+            document.getElementById('report-content').style.fontSize = val + '%';
+        }
+
         function startResearch(event) {
             event.preventDefault();
             const topic = document.getElementById('topic-input').value;
@@ -179,6 +207,7 @@
             
             const logs = document.getElementById('logs');
             const pBar = document.getElementById('progress-bar');
+            const pPct = document.getElementById('progress-pct');
             const sText = document.getElementById('status-text');
             
             const evtSource = new EventSource(`/stream-research?topic=${encodeURIComponent(topic)}&language=${lang}`);
@@ -188,7 +217,9 @@
                 if (data.startsWith("[PROGRESS:")) {
                     const match = data.match(/\[PROGRESS:(\d+)\](.*)/);
                     if (match) {
-                        pBar.style.width = match[1] + '%';
+                        const pct = match[1];
+                        pBar.style.width = pct + '%';
+                        pPct.innerText = pct + '%';
                         sText.innerText = match[2];
                         logs.innerHTML += `<div>${match[2]}</div>`;
                         logs.scrollTop = logs.scrollHeight;
@@ -200,7 +231,10 @@
                             evtSource.close();
                             currentTopic = json.metrics.safe_topic;
                             document.getElementById('res-topic').innerText = json.topic;
+                            document.getElementById('download-md').href = json.metrics.md_path;
+                            document.getElementById('download-html').href = json.metrics.html_path;
                             document.getElementById('report-content').innerHTML = json.report;
+                            
                             document.getElementById('terminal-container').classList.add('hidden');
                             document.getElementById('result-container').classList.remove('hidden');
                         }

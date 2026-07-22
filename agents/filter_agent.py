@@ -50,14 +50,11 @@ def filter_and_rank_articles(articles: list, top_n: int = 40) -> tuple:
     }
     
     payload = {
-        "model": "meta/llama-3.1-70b-instruct", 
-        "messages": [
-            {"role": "system", "content": "You are a JSON-only data parsing API. Output strictly valid JSON arrays without markdown blocks."},
-            {"role": "user", "content": prompt}
-        ], 
-        "temperature": 0.1, # Temperature low kar diya for predictable JSON
-        "max_tokens": 3000
-    }
+    "model": "meta/llama-3.1-8b-instruct", # Yahan 8B kar diya ranking ke liye
+    "messages": [...], 
+    "temperature": 0.1,
+    "max_tokens": 3000
+}
 
     max_retries = 3
     for attempt in range(1, max_retries + 1):
