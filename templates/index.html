@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Research Agent - Executive Intelligence</title>
+    <title>ThesisPilot - Your Personal Ivy-League Researcher</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { word-break: break-word; overflow-wrap: break-word; }
@@ -22,17 +22,28 @@
         #report-content blockquote { border-left: 4px solid #10b981; background: rgba(16, 185, 129, 0.05); padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 1rem 0; color: #cbd5e1; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-teal-500 selection:text-white">
 
     <header class="border-b border-slate-800/80 px-4 py-3 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
         <div class="max-w-4xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-                <span class="text-xl">🚀</span>
-                <h1 class="text-base sm:text-lg font-bold bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                    AI Research Agent
-                </h1>
+            
+            <!-- Rebranded Header -->
+            <div class="flex items-center gap-3">
+                <div class="p-1.5 bg-slate-800 rounded-lg border border-slate-700 shadow-sm">
+                    <span class="text-xl sm:text-2xl">🎓</span>
+                </div>
+                <div class="flex flex-col justify-center">
+                    <h1 class="text-lg sm:text-xl font-extrabold bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 bg-clip-text text-transparent drop-shadow-sm leading-tight">
+                        ThesisPilot
+                    </h1>
+                    <span class="text-[10px] sm:text-xs text-slate-400 font-medium tracking-wide mt-0.5">
+                        Your personal Ivy-League researcher.
+                    </span>
+                </div>
             </div>
-            <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium">● Live V4.2 (Progress Bar Restored)</span>
+            <!-- Version Tag -->
+            <span class="text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium hidden sm:block">● Live V5.0</span>
+            
         </div>
     </header>
 
@@ -41,41 +52,41 @@
         <!-- Input Form -->
         <div id="form-container" class="max-w-xl mx-auto w-full space-y-6 py-8">
             <div class="text-center space-y-2">
-                <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">Autonomous Intelligence</h2>
-                <p class="text-slate-400 text-xs sm:text-sm">Search ➔ Llama 70B Ranking ➔ Async Scraping ➔ Deep Synthesis.</p>
+                <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">Automated Literature Review</h2>
+                <p class="text-slate-400 text-xs sm:text-sm">Search ➔ Rank via 70B Model ➔ Async Scraping ➔ Deep Synthesis.</p>
             </div>
             
             <form id="research-form" onsubmit="startResearch(event)" class="space-y-4 bg-slate-900/80 p-6 rounded-2xl border border-slate-800 shadow-2xl">
                 <div>
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Research Topic</label>
-                    <input type="text" id="topic-input" required placeholder="e.g. Future of humanoid robotics 2026..." 
-                           class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 text-sm focus:outline-none focus:border-indigo-500 transition">
+                    <input type="text" id="topic-input" required placeholder="e.g. Feasibility of Self-Healing Concrete 2026..." 
+                           class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 text-sm focus:outline-none focus:border-teal-500 transition">
                 </div>
                 
                 <div>
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Report Language Style</label>
-                    <select id="lang-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 text-sm focus:outline-none focus:border-indigo-500 transition">
-                        <option value="english">English (Professional)</option>
-                        <option value="hinglish">Hinglish (Conversational Roman Script)</option>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Report Output Style</label>
+                    <select id="lang-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 text-sm focus:outline-none focus:border-teal-500 transition">
+                        <option value="english">Professional English (Academic)</option>
+                        <option value="hinglish">Hinglish (Conversational)</option>
                         <option value="hindi">Hindi (Devanagari)</option>
                     </select>
                 </div>
                 
-                <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 font-semibold text-sm py-3 rounded-xl transition shadow-lg shadow-indigo-600/20">
-                    Generate Executive Briefing
+                <button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 font-semibold text-sm py-3 rounded-xl transition shadow-lg shadow-teal-600/20 text-white">
+                    Generate Comprehensive Report
                 </button>
             </form>
         </div>
 
-        <!-- 🌟 Restored Live Progress Bar & Terminal Screen -->
+        <!-- 🌟 Live Progress Bar & Terminal Screen -->
         <div id="terminal-container" class="hidden space-y-4 max-w-xl mx-auto w-full py-10">
             <div class="text-center space-y-2">
                 <h3 class="text-lg font-bold text-slate-200">Executing Autonomous Pipeline...</h3>
-                <p id="progress-status-text" class="text-xs text-indigo-400 font-mono">Initializing worker nodes...</p>
+                <p id="progress-status-text" class="text-xs text-teal-400 font-mono">Initializing worker nodes...</p>
             </div>
 
             <div class="w-full bg-slate-900 rounded-full h-3 p-0.5 border border-slate-800 shadow-inner">
-                <div id="progress-bar-fill" class="bg-gradient-to-r from-indigo-500 via-blue-500 to-emerald-400 h-2 rounded-full transition-all duration-300" style="width: 5%;"></div>
+                <div id="progress-bar-fill" class="bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-400 h-2 rounded-full transition-all duration-300" style="width: 5%;"></div>
             </div>
             <div class="flex justify-between text-xs text-slate-400 font-mono font-semibold">
                 <span>Progress</span>
@@ -90,46 +101,64 @@
         <!-- Result Dashboard -->
         <div id="result-container" class="hidden space-y-6 py-4">
             
-            <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl flex flex-col lg:flex-row items-center justify-between gap-4">
+            <!-- Controls Bar -->
+            <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl flex flex-col lg:flex-row items-center justify-between gap-4 shadow-lg">
                 <div class="w-full lg:w-auto truncate">
                     <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Active Topic</span>
                     <h3 id="res-topic" class="text-base font-bold text-white capitalize truncate"></h3>
                 </div>
                 
                 <div class="flex items-center space-x-2 bg-slate-950 px-3 py-2 rounded-xl border border-slate-800 w-full lg:w-auto justify-center">
-                    <span class="text-[10px] text-slate-400 font-semibold uppercase whitespace-nowrap">Font: <span id="font-val" class="text-indigo-400 font-bold">100</span>%</span>
-                    <input type="range" min="50" max="150" value="100" step="5" oninput="changeFontSize(this.value)" class="w-24 accent-indigo-500 cursor-pointer">
+                    <span class="text-[10px] text-slate-400 font-semibold uppercase whitespace-nowrap">Font: <span id="font-val" class="text-teal-400 font-bold">100</span>%</span>
+                    <input type="range" min="50" max="150" value="100" step="5" oninput="changeFontSize(this.value)" class="w-24 accent-teal-500 cursor-pointer">
                 </div>
 
                 <div class="flex flex-wrap items-center justify-center gap-2 w-full lg:w-auto">
-                    <button id="speak-btn" onclick="toggleSpeech()" class="bg-pink-600 hover:bg-pink-500 text-xs px-3 py-2 rounded-xl font-bold transition text-white shadow-lg shadow-pink-600/20 flex items-center space-x-1">
-                        <span>🔊 Read Report</span>
+                    <!-- 🎙️ Podcast Mode Button -->
+                    <button id="podcast-btn" onclick="startPodcastMode()" class="bg-amber-500 hover:bg-amber-400 text-xs px-3 py-2 rounded-xl font-bold transition text-black shadow-lg shadow-amber-500/20 flex items-center space-x-1">
+                        <span>🎙️ Podcast Mode</span>
                     </button>
+                    
                     <a id="download-md" href="#" download class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-xl font-medium transition border border-slate-700 text-slate-300">.md</a>
-                    <a id="download-html" href="#" download class="bg-indigo-600 hover:bg-indigo-500 text-xs px-3 py-2 rounded-xl font-medium transition text-white">.html</a>
-                    <button onclick="location.reload()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-xl font-medium transition border border-slate-700 text-slate-300">New</button>
+                    <a id="download-html" href="#" download class="bg-teal-600 hover:bg-teal-500 text-xs px-3 py-2 rounded-xl font-medium transition text-white">.html</a>
+                    <button onclick="location.reload()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-xl font-medium transition border border-slate-700 text-slate-300">New Topic</button>
                 </div>
             </div>
 
+            <!-- Stats Grid -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                <div class="bg-slate-900/60 border border-slate-800/80 p-3 rounded-xl">
+                <div class="bg-slate-900/60 border border-slate-800/80 p-3 rounded-xl shadow-sm">
                     <span class="text-[10px] text-slate-400 block uppercase font-semibold">Time Taken</span>
-                    <span id="m-time" class="text-sm font-bold text-indigo-400"></span>
+                    <span id="m-time" class="text-sm font-bold text-teal-400"></span>
                 </div>
-                <div class="bg-slate-900/60 border border-slate-800/80 p-3 rounded-xl">
+                <div class="bg-slate-900/60 border border-slate-800/80 p-3 rounded-xl shadow-sm">
                     <span class="text-[10px] text-slate-400 block uppercase font-semibold">LLM Calls</span>
-                    <span id="m-calls" class="text-sm font-bold text-indigo-400"></span>
+                    <span id="m-calls" class="text-sm font-bold text-teal-400"></span>
                 </div>
-                <div class="bg-slate-900/60 border border-slate-800/80 p-3 rounded-xl">
+                <div class="bg-slate-900/60 border border-slate-800/80 p-3 rounded-xl shadow-sm">
                     <span class="text-[10px] text-slate-400 block uppercase font-semibold">Raw Fetched</span>
-                    <span id="m-fetched" class="text-sm font-bold text-indigo-400"></span>
+                    <span id="m-fetched" class="text-sm font-bold text-teal-400"></span>
                 </div>
-                <div class="bg-slate-900/60 border border-slate-800/80 p-3 rounded-xl">
+                <div class="bg-slate-900/60 border border-slate-800/80 p-3 rounded-xl shadow-sm">
                     <span class="text-[10px] text-slate-400 block uppercase font-semibold">Scraped Success</span>
                     <span id="m-scraped" class="text-sm font-bold text-emerald-400"></span>
                 </div>
             </div>
+            
+            <!-- 🎙️ Live Podcast UI Box (Hidden initially) -->
+            <div id="podcast-ui" class="hidden bg-slate-950 border border-amber-500/50 p-4 rounded-xl shadow-xl shadow-amber-500/10">
+                <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+                    <span class="text-amber-400 font-bold text-sm flex items-center gap-2">
+                        <span class="animate-pulse">🔴</span> LIVE AI PODCAST
+                    </span>
+                    <button onclick="stopPodcast()" class="text-xs bg-red-600 hover:bg-red-500 px-3 py-1 rounded-md text-white font-bold transition">Stop Audio</button>
+                </div>
+                <div id="podcast-subtitles" class="text-sm font-medium text-slate-300 min-h-[60px] leading-relaxed">
+                    <span class="text-slate-500 italic">🧠 AI is analyzing the report and writing the podcast script... (takes ~5 seconds)</span>
+                </div>
+            </div>
 
+            <!-- Main Report Content -->
             <div class="bg-slate-900/90 border border-slate-800 p-6 sm:p-10 rounded-2xl shadow-2xl overflow-hidden">
                 <div id="report-content" class="transition-all duration-150" style="font-size: 15px;">
                 </div>
@@ -138,51 +167,104 @@
 
     </main>
 
-    <footer class="text-center py-4 text-[11px] text-slate-500 border-t border-slate-900 mt-12">
-        Powered by Tavily, NVIDIA Llama-3.1 70B, and Gemini.
+    <footer class="text-center py-6 text-[11px] text-slate-500 border-t border-slate-900 mt-12">
+        Built with Llama-3.1 70B and Gemini. Your private research engine.
     </footer>
 
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        let isSpeaking = false;
-        const synth = window.speechSynthesis;
-        let utterance = null;
-
-        function toggleSpeech() {
-            const btn = document.getElementById('speak-btn');
-            if (isSpeaking) {
-                synth.cancel();
-                isSpeaking = false;
-                btn.innerHTML = '🔊 Read Report';
-                btn.classList.replace('bg-red-600', 'bg-pink-600');
-                return;
-            }
-            const reportContent = document.getElementById('report-content').innerText;
-            if (!reportContent) return;
-
-            utterance = new SpeechSynthesisUtterance(reportContent);
-            const selectedLang = document.getElementById('lang-input').value;
-            utterance.lang = (selectedLang === 'hindi' || selectedLang === 'hinglish') ? 'hi-IN' : 'en-US';
-            utterance.rate = 0.9;
-            
-            utterance.onend = function() {
-                isSpeaking = false;
-                btn.innerHTML = '🔊 Read Report';
-                btn.classList.replace('bg-red-600', 'bg-pink-600');
-            };
-
-            synth.speak(utterance);
-            isSpeaking = true;
-            btn.innerHTML = '🔇 Stop Reading';
-            btn.classList.replace('bg-pink-600', 'bg-red-600');
-        }
-
-        window.onbeforeunload = function() { if (synth) synth.cancel(); };
-
+        // --- UI Logic ---
         function changeFontSize(val) {
             document.getElementById('font-val').innerText = val;
             document.getElementById('report-content').style.fontSize = val + '%';
         }
 
+        // --- Podcast Logic ---
+        let podcastScript = [];
+        let currentLine = 0;
+        let isPodcastPlaying = false;
+
+        async function startPodcastMode() {
+            const reportText = document.getElementById('report-content').innerText;
+            if (!reportText) return;
+
+            // UI Updates
+            document.getElementById('podcast-ui').classList.remove('hidden');
+            document.getElementById('podcast-subtitles').innerHTML = `<span class="text-slate-500 italic">🧠 AI is generating the podcast script and initializing voices...</span>`;
+            document.getElementById('podcast-btn').disabled = true;
+            document.getElementById('podcast-btn').classList.add('opacity-50', 'cursor-not-allowed');
+
+            try {
+                const response = await fetch('/generate-podcast', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ report_text: reportText })
+                });
+                
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+                
+                podcastScript = data.script;
+                currentLine = 0;
+                isPodcastPlaying = true;
+                playNextPodcastLine();
+                
+            } catch (error) {
+                document.getElementById('podcast-subtitles').innerHTML = `<span class="text-red-400">❌ Failed to generate podcast: ${error.message}</span>`;
+                resetPodcastBtn();
+            }
+        }
+
+        function playNextPodcastLine() {
+            if (!isPodcastPlaying || currentLine >= podcastScript.length) {
+                stopPodcast();
+                return;
+            }
+
+            const line = podcastScript[currentLine];
+            const subtitleBox = document.getElementById('podcast-subtitles');
+            
+            // Visual Update
+            const speakerColor = line.speaker.includes('A') ? 'text-teal-400' : 'text-emerald-400';
+            subtitleBox.innerHTML = `<strong class="${speakerColor}">${line.speaker}:</strong> <span class="text-white">${line.text}</span>`;
+
+            // Setup Speech
+            const utterance = new SpeechSynthesisUtterance(line.text);
+            const voices = window.speechSynthesis.getVoices();
+            
+            // Assign Voices (Attempt to get distinct voices)
+            const voiceA = voices.find(v => v.lang.includes('en') && v.name.includes('Female')) || voices.find(v => v.lang.includes('en-US')) || voices[0];
+            const voiceB = voices.find(v => v.lang.includes('en') && (v.name.includes('Male') || v.name.includes('Google UK'))) || voices.find(v => v.lang.includes('en-GB')) || voices.reverse()[0];
+
+            utterance.voice = line.speaker.includes('A') ? voiceA : voiceB;
+            utterance.rate = 1.05; 
+            utterance.pitch = line.speaker.includes('A') ? 1.1 : 0.9;
+
+            utterance.onend = () => {
+                currentLine++;
+                playNextPodcastLine();
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function stopPodcast() {
+            isPodcastPlaying = false;
+            window.speechSynthesis.cancel();
+            document.getElementById('podcast-ui').classList.add('hidden');
+            resetPodcastBtn();
+        }
+
+        function resetPodcastBtn() {
+            const btn = document.getElementById('podcast-btn');
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        // Cancel speech if user navigates away
+        window.onbeforeunload = function() { if (window.speechSynthesis) window.speechSynthesis.cancel(); };
+
+        // --- Core Research Engine Logic (SSE) ---
         function startResearch(event) {
             event.preventDefault();
             const topic = document.getElementById('topic-input').value;
@@ -196,15 +278,15 @@
             const progressPct = document.getElementById('progress-pct');
             const progressStatusText = document.getElementById('progress-status-text');
 
-            terminalLogs.innerHTML = `<p class="text-cyan-400">[info] 🚀 Launching research pipeline for '${topic}'...</p>`;
+            terminalLogs.innerHTML = `<p class="text-teal-400">[info] 🚀 Booting ThesisPilot engine for '${topic}'...</p>`;
 
             const eventSource = new EventSource(`/stream-research?topic=${encodeURIComponent(topic)}&language=${encodeURIComponent(language)}`);
 
             eventSource.onmessage = function(event) {
                 const rawData = event.data;
-
                 let pct = 10;
                 let cleanData = rawData;
+                
                 if (rawData.startsWith("[PROGRESS:")) {
                     const match = rawData.match(/\[PROGRESS:(\d+)\](.*)/);
                     if (match) {
@@ -213,7 +295,7 @@
                     }
                 }
 
-                // Smooth Progress Bar Update
+                // Progress Bar Update
                 progressBarFill.style.width = pct + '%';
                 progressPct.innerText = pct + '%';
                 progressStatusText.innerText = cleanData;
@@ -244,6 +326,7 @@
                     } catch (e) {}
                 }
 
+                // Format terminal logs
                 let formattedLog = cleanData
                     .replace('[step]', '🚀 ')
                     .replace('[/step]', '')
@@ -263,7 +346,7 @@
             };
 
             eventSource.onerror = function(err) {
-                terminalLogs.innerHTML += `<p class="text-red-400">❌ Stream connection closed.</p>`;
+                terminalLogs.innerHTML += `<p class="text-red-400">❌ Connection timeout. Background synthesis might still be running.</p>`;
                 eventSource.close();
             };
         }
