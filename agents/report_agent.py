@@ -7,7 +7,7 @@ from config import console, NVIDIA_API_KEY
 
 # 🚀 FIX 1: Added Model Selection & Retry Logic
 def call_nvidia_api(prompt: str, max_tokens: int = 4000, temp: float = 0.4, model: str = "meta/llama-3.1-70b-instruct", retries: int = 2):
-    url = https://integrate.api.nvidia.com/v1/chat/completions
+    url = "https://integrate.api.nvidia.com/v1/chat/completions"
     headers = {"Authorization": f"Bearer {NVIDIA_API_KEY}", "Content-Type": "application/json"}
     payload = {
         "model": model,
