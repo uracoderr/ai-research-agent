@@ -5,7 +5,8 @@ from config import console, NVIDIA_API_KEY
 
 def call_nvidia_api(prompt: str, max_tokens: int = 4096, temp: float = 0.3, system_prompt: str = ""):
     """Utility function for all NVIDIA Llama-3.1-70B interactions"""
-    url = "https://integrate.api.nvidia.com/v1/chat/completions"
+    # Clean URL explicitly
+    url = "https://integrate.api.nvidia.com/v1/chat/completions".strip("() '\"")
     headers = {"Authorization": f"Bearer {NVIDIA_API_KEY}", "Content-Type": "application/json"}
     
     messages = []

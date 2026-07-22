@@ -5,7 +5,8 @@ def optimize_query(query: str) -> str:
     console.print("\n[step]▶ PHASE 0: QUERY OPTIMIZATION (NVIDIA LLM)[/step]")
     prompt = f"You are a strict query optimizer. Correct any spelling mistakes or typos in this search query. Return ONLY the exact corrected query string, absolutely nothing else. Do not add quotes, intro text, or markdown. Original: '{query}'"
     
-    url = "[https://integrate.api.nvidia.com/v1/chat/completions](https://integrate.api.nvidia.com/v1/chat/completions)"
+    # Clean URL explicitly
+    url = "https://integrate.api.nvidia.com/v1/chat/completions".strip("() '\"")
     headers = {"Authorization": f"Bearer {NVIDIA_API_KEY}", "Content-Type": "application/json"}
     payload = {
         "model": "meta/llama-3.1-70b-instruct",
@@ -34,7 +35,8 @@ def fetch_articles(query: str, max_results: int = 20) -> list:
     console.print(f"\n[step]▶ PHASE 1: SEARCHING WEB[/step]")
     console.print(f"[info]🔍 Tavily API se '{query}' ke liye {max_results} articles fetch kar rahe hain...[/info]")
     
-    url = "[https://api.tavily.com/search](https://api.tavily.com/search)"
+    # Clean URL explicitly
+    url = "https://api.tavily.com/search".strip("() '\"")
     payload = {
         "api_key": TAVILY_API_KEY, 
         "query": query, 
