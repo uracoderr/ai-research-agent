@@ -109,7 +109,7 @@ def generate_podcast_script(report_text: str):
         return [{"speaker": "System", "text": "JSON Parsing Error."}]
 
 def generate_diagram(report_text: str):
-    # 🚀 FIX: Extremely strict prompt to avoid Mermaid syntax errors
+    # 🚀 FIX: Fast 8B Model & Extremely strict prompt
     prompt = f"""
     Create a simple Mermaid.js flowchart ('graph TD') summarizing this report. 
     CRITICAL RULES:
@@ -119,6 +119,7 @@ def generate_diagram(report_text: str):
     4. RETURN STRICTLY MERMAID CODE. NO MARKDOWN.
     Report: {report_text[:8000]}
     """
+    # 8B model call kiya taaki Render par Timeout (100s limit) na ho
     res = call_nvidia_api(prompt, max_tokens=1000, temp=0.1, model="meta/llama-3.1-8b-instruct")
     
     clean_code = res.replace("```mermaid", "").replace("```", "").strip()

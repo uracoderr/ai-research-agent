@@ -244,7 +244,6 @@
         async function loadPastReport(safeTopic) {
             closeMobileSidebar();
             
-            // 🚀 BUG FIX: Naya report load hone par purani chat history clear karo
             document.getElementById('rag-chat').innerHTML = "";
             document.getElementById('challenge-chat').innerHTML = "";
 
@@ -323,7 +322,6 @@
                             document.getElementById('terminal-container').classList.add('hidden');
                             document.getElementById('result-container').classList.remove('hidden');
                             
-                            // 🚀 BUG FIX: Fresh research banne par purani chats clear karo
                             document.getElementById('rag-chat').innerHTML = "";
                             document.getElementById('challenge-chat').innerHTML = "";
                             
@@ -336,7 +334,7 @@
 
         // Interactive Tools - Podcast
         let podcastPlaying = false;
-        window.currentUtt = null; // 🚀 BUG FIX: Browser Garbage collection bypass
+        window.currentUtt = null;
 
         async function startPodcastMode() {
             const report = document.getElementById('report-content').innerText;
@@ -355,7 +353,7 @@
         }
 
         function playPodcastStream(scriptArr, box) {
-            window.speechSynthesis.cancel(); // 🚀 BUG FIX: Purana audio clear karo
+            window.speechSynthesis.cancel();
             podcastPlaying = true;
             let i = 0;
             function playNext() {
@@ -371,7 +369,7 @@
                 utt.onend = () => { i++; playNext(); };
                 utt.onerror = (e) => { console.log("TTS Error:", e); i++; playNext(); };
                 
-                window.currentUtt = utt; // Global reference to prevent garbage collection
+                window.currentUtt = utt; 
                 window.speechSynthesis.speak(utt);
             }
             playNext();
@@ -393,12 +391,22 @@
                     method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({report_text: report})
                 });
+                
+                // 🚀 NEW FIX: Agar Server error (HTML) bhejta hai
+                if (!res.ok) {
+                    throw new Error(`Server Timeout or Crash (Status: ${res.status}). Check backend logs.`);
+                }
+
                 const data = await res.json();
                 if (data.mermaid) {
                     box.innerHTML = `<div class="mermaid">${data.mermaid}</div>`;
                     mermaid.init(undefined, document.querySelectorAll('.mermaid'));
-                } else box.innerHTML = "Error generating diagram.";
-            } catch (e) { box.innerHTML = e.message; }
+                } else {
+                    box.innerHTML = "Error generating diagram.";
+                }
+            } catch (e) { 
+                box.innerHTML = `<span class="text-red-400 font-bold text-xs">${e.message}</span>`; 
+            }
         }
 
         // Interactive Tools - RAG & Challenge Chat
