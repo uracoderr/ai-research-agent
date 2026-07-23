@@ -175,7 +175,47 @@ async def api_challenge(req: InteractiveRequest):
     except Exception as e:
         return {"error": str(e)}
 
+
+# 📜 API 1: Get list of all past research reports
+@app.get("/api/history")
+async def get_history():
+    history_list = []
+    if os.path.exists(reports_dir):
+        for file in os.listdir(reports_dir):
+            if file.endswith("_report.md"):
+                safe_topic = file.replace("_report.md", "")
+                display_title = safe_topic.replace("_", " ").title()
+                history_list.append({
+                    "safe_topic": safe_topic,
+                    "title": display_title
+                })
+    # Latest research ko pehle dikhane ke liye reverse kar rahe hain
+    return {"history": history_list[::-1]}
+
+# 📖 API 2: Fetch a specific past report by topic
+@app.get("/api/report/{safe_topic}")
+async def get_past_report(safe_topic: str):
+    md_filename = os.path.join(reports_dir, f"{safe_topic}_report.md")
+    if not os.path.exists(md_filename):
+        return {"error": "Report not found"}
+    
+    with open(md_filename, "r", encoding="utf-8") as f:
+        md_content = f.read()
+    
+    report_html = markdown.markdown(md_content, extensions=['tables', 'fenced_code'])
+    
+    return {
+        "topic": safe_topic.replace("_", " ").title(),
+        "safe_topic": safe_topic,
+        "report": report_html,
+        "md_path": f"/reports/{safe_topic}_report.md",
+        "html_path": f"/reports/{safe_topic}_report.html"
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run("app:app", host="0.0.0.0", port=port)
+
+
