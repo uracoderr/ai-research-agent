@@ -20,9 +20,17 @@
         .markdown-body th { background-color: #1e293b; color: #f8fafc; }
         .markdown-body td { background-color: #0f172a; color: #cbd5e1; }
         
+        /* Strict Tab Management */
         .tab-content { display: none; }
         .tab-content.active { display: flex; flex-direction: column; }
 
+        /* 🚀 NEW: Mermaid Diagram Fix for Mobile Horizontal Scroll */
+        .mermaid svg {
+            min-width: 800px !important;
+            height: auto;
+        }
+
+        /* Shimmer Animation for Progress Bar */
         @keyframes shimmer {
             0% { background-position: -200% 0; }
             100% { background-position: 200% 0; }
@@ -392,7 +400,6 @@
                     body: JSON.stringify({report_text: report})
                 });
                 
-                // 🚀 NEW FIX: Agar Server error (HTML) bhejta hai
                 if (!res.ok) {
                     throw new Error(`Server Timeout or Crash (Status: ${res.status}). Check backend logs.`);
                 }
