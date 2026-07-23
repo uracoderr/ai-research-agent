@@ -3,191 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ThesisPilot - AI Research Engine</title>
+    <title>ThesisPilot - Academic Research Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.9/purify.min.js"></script>
     <style>
         body { word-break: break-word; overflow-wrap: break-word; }
-        .markdown-body h1 { font-size: 1.5rem; font-weight: 800; color: #f8fafc; border-bottom: 2px solid #334155; padding-bottom: 0.5rem; margin-bottom: 1.25rem;}
-        .markdown-body h2 { font-size: 1.2rem; font-weight: 700; color: #38bdf8; margin-top: 1.75rem; margin-bottom: 0.75rem; border-left: 4px solid #6366f1; padding-left: 10px;}
-        .markdown-body h3 { font-size: 1.05rem; font-weight: 600; color: #cbd5e1; margin-top: 1.25rem; margin-bottom: 0.5rem; }
-        .markdown-body p { color: #94a3b8; line-height: 1.7; margin-bottom: 1rem; }
-        .markdown-body ul, .markdown-body ol { margin-bottom: 1rem; padding-left: 1.25rem; color: #94a3b8; }
-        .markdown-body li { margin-bottom: 0.4rem; line-height: 1.5; }
-        .markdown-body strong { color: #f1f5f9; font-weight: 600; }
-        .markdown-body table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.85rem; display: block; overflow-x: auto;}
+        .markdown-body h1, .markdown-body h2 { color: #38bdf8; margin-top: 1.5rem; margin-bottom: 0.75rem; border-left: 4px solid #6366f1; padding-left: 10px;}
+        .markdown-body p, .markdown-body li { color: #94a3b8; line-height: 1.7; margin-bottom: 1rem; }
+        .markdown-body table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.85rem;}
         .markdown-body th, .markdown-body td { border: 1px solid #334155; padding: 8px 12px; }
         .markdown-body th { background-color: #1e293b; color: #f8fafc; }
-        .markdown-body td { background-color: #0f172a; color: #cbd5e1; }
-        
-        /* Strict Tab Management */
         .tab-content { display: none; }
         .tab-content.active { display: flex; flex-direction: column; }
-
-        /* 🚀 NEW: Mermaid Diagram Fix for Mobile Horizontal Scroll */
-        .mermaid svg {
-            min-width: 800px !important;
-            height: auto;
-        }
-
-        /* Shimmer Animation for Progress Bar */
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-        .progress-shimmer {
-            background: linear-gradient(90deg, #0d9488 0%, #2dd4bf 50%, #0d9488 100%);
-            background-size: 200% 100%;
-            animation: shimmer 2s infinite linear;
-        }
+        .mermaid svg { min-width: 800px !important; height: auto; }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        .progress-shimmer { background: linear-gradient(90deg, #0d9488 0%, #2dd4bf 50%, #0d9488 100%); background-size: 200% 100%; animation: shimmer 2s infinite linear; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex selection:bg-teal-500 selection:text-white relative overflow-x-hidden">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex relative">
 
-    <div id="mobile-overlay" class="fixed inset-0 bg-black/70 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
-
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 border-r border-slate-800/80 flex flex-col h-screen transform -translate-x-full transition-transform duration-300 ease-in-out md:relative md:translate-x-0 md:shrink-0">
-        <div class="p-4 border-b border-slate-800 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <span class="text-xl">🎓</span>
-                <h1 class="text-base font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-500 bg-clip-text text-transparent">ThesisPilot</h1>
-            </div>
-            <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white p-1">✖</button>
-            <span class="hidden md:inline-block text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">V5.0</span>
-        </div>
-
-        <div class="p-3">
-            <button onclick="showNewResearchForm()" class="w-full bg-teal-600/20 hover:bg-teal-600/30 text-teal-400 border border-teal-500/30 text-xs font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2">
-                <span>➕</span> New Research
-            </button>
-        </div>
-
-        <div class="flex-1 overflow-y-auto px-3 py-2 space-y-1">
-            <p class="text-[10px] font-bold text-slate-500 uppercase px-2 mb-2 tracking-wider">Past Researches</p>
-            <div id="history-list" class="space-y-1 text-xs">
-                <p class="text-slate-600 text-[11px] px-2 italic">Loading history...</p>
-            </div>
+    <aside id="sidebar" class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col h-screen hidden md:flex shrink-0">
+        <div class="p-4 border-b border-slate-800"><h1 class="text-xl font-bold text-teal-400">🎓 ThesisPilot</h1></div>
+        <div class="p-3"><button onclick="showNewResearchForm()" class="w-full bg-teal-600/20 text-teal-400 py-2 rounded-xl">➕ New Assignment</button></div>
+        <div class="flex-1 overflow-y-auto px-3 py-2">
+            <p class="text-[10px] text-slate-500 uppercase px-2 mb-2">My Drafts (Local)</p>
+            <div id="history-list" class="space-y-1 text-xs text-slate-600 px-2">Loading...</div>
         </div>
     </aside>
 
     <div class="flex-1 flex flex-col h-screen overflow-y-auto w-full">
-        
-        <div class="md:hidden flex items-center justify-between p-4 bg-slate-900 border-b border-slate-800 sticky top-0 z-30">
-            <div class="flex items-center gap-2">
-                <span class="text-xl">🎓</span>
-                <h1 class="text-base font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-500 bg-clip-text text-transparent">ThesisPilot</h1>
-            </div>
-            <button onclick="toggleSidebar()" class="text-slate-300 hover:text-white p-1">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            </button>
-        </div>
-
-        <main class="max-w-5xl mx-auto w-full px-4 md:px-6 py-6 flex-grow flex flex-col">
-            
-            <div id="form-container" class="max-w-xl mx-auto w-full space-y-6 mt-4 md:mt-10">
-                <h2 class="text-2xl md:text-3xl font-extrabold text-center">Autonomous Research</h2>
-                <form onsubmit="startResearch(event)" class="bg-slate-900/80 p-5 md:p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
-                    <div>
-                        <label class="text-xs font-bold text-slate-400 uppercase">Research Topic</label>
-                        <textarea id="topic-input" rows="3" required placeholder="e.g. Future of Artificial Intelligence in 2026..." 
-                                  class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm mt-1 focus:border-teal-500 outline-none transition resize-none"></textarea>
-                    </div>
-                    <div>
-                        <label class="text-xs font-bold text-slate-400 uppercase">Language</label>
-                        <select id="lang-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm mt-1 focus:border-teal-500 outline-none transition">
-                            <option value="english">English</option>
-                            <option value="hinglish">Hinglish</option>
-                            <option value="hindi">Hindi</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="w-full bg-teal-600 hover:bg-teal-500 font-bold py-3 rounded-xl transition text-white shadow-lg shadow-teal-900/50">Run Deep Synthesis</button>
+        <main class="max-w-5xl mx-auto w-full px-4 py-6 flex flex-col">
+            <div id="form-container" class="max-w-xl mx-auto w-full space-y-6 mt-10">
+                <form onsubmit="startResearch(event)" class="bg-slate-900/80 p-6 rounded-2xl border border-slate-800">
+                    <label class="text-xs font-bold text-slate-400">Assignment Topic</label>
+                    <textarea id="topic-input" rows="3" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm my-2 text-white"></textarea>
+                    <button type="submit" class="w-full bg-teal-600 py-3 rounded-xl font-bold">Research & Draft Assignment</button>
                 </form>
             </div>
 
             <div id="terminal-container" class="hidden max-w-xl mx-auto w-full py-10 space-y-4">
-                <h3 class="text-center font-bold text-slate-300">Pipeline Executing...</h3>
-                <p id="status-text" class="text-center text-xs text-teal-400 font-mono">Initializing agents...</p>
-                <div class="w-full bg-slate-900 rounded-full h-3 p-0.5 border border-slate-800">
-                    <div id="progress-bar" class="progress-shimmer h-2 rounded-full transition-all duration-500" style="width:5%"></div>
-                </div>
-                <div class="flex justify-between text-xs text-slate-400 font-mono">
-                    <span>Progress</span>
-                    <span id="progress-pct">5%</span>
-                </div>
-                <div id="logs" class="bg-black text-[10px] text-emerald-400 p-4 rounded-xl h-40 overflow-y-auto border border-slate-800 whitespace-pre-wrap font-mono"></div>
+                <p id="status-text" class="text-center text-xs text-teal-400 font-mono">Initializing...</p>
+                <div class="w-full bg-slate-900 rounded-full h-3 border border-slate-800"><div id="progress-bar" class="progress-shimmer h-2 rounded-full" style="width:5%"></div></div>
             </div>
 
             <div id="result-container" class="hidden w-full space-y-6">
-                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-wrap gap-4 items-center justify-between">
-                    <div>
-                        <span class="text-[10px] text-slate-500 uppercase font-bold">Active Topic</span>
-                        <h3 id="res-topic" class="text-sm md:text-base font-bold text-white capitalize"></h3>
-                    </div>
-                    <div class="hidden md:flex items-center space-x-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
-                        <span class="text-[10px] text-slate-400 font-semibold uppercase">Zoom: <span id="zoom-val" class="text-teal-400 font-bold">100</span>%</span>
-                        <input type="range" min="50" max="150" value="100" step="5" oninput="changeZoom(this.value)" class="w-20 accent-teal-500 cursor-pointer">
-                    </div>
-                    <div class="flex flex-wrap items-center gap-2">
-                        <a id="download-md" href="#" download class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-lg font-medium transition border border-slate-700 text-slate-300">.md</a>
-                        <a id="download-html" href="#" download class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-lg font-medium transition border border-slate-700 text-slate-300">.html</a>
-                        <button onclick="window.print()" class="bg-teal-600/20 text-teal-400 hover:bg-teal-600/30 border border-teal-500/30 text-xs px-3 py-2 rounded-lg font-medium transition">PDF</button>
-                    </div>
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex justify-between">
+                    <h3 id="res-topic" class="font-bold text-white capitalize"></h3>
+                    <a id="download-md" class="bg-slate-800 text-xs px-3 py-2 rounded-lg">Download .md</a>
                 </div>
-
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-                    <div class="lg:col-span-2 bg-slate-900 border border-slate-800 p-4 md:p-6 rounded-xl shadow-lg max-h-[600px] md:max-h-[750px] overflow-y-auto">
-                        <div id="report-content" class="markdown-body transition-all duration-150" style="font-size: 15px;"></div>
+                    <div class="lg:col-span-2 bg-slate-900 border border-slate-800 p-6 rounded-xl shadow-lg max-h-[750px] overflow-y-auto">
+                        <div id="report-content" class="markdown-body"></div>
                     </div>
-
-                    <div class="lg:col-span-1 space-y-4 md:sticky top-6">
-                        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
-                            <h4 class="font-bold text-teal-400 mb-3 border-b border-slate-800 pb-2 text-sm">🛠 Interactive Tools</h4>
-                            <div class="grid grid-cols-2 lg:grid-cols-1 gap-2.5">
-                                <button onclick="openTab('podcast-tab'); startPodcastMode();" class="bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 border border-amber-500/30 p-2.5 rounded-lg text-xs font-bold flex justify-between items-center">
-                                    <span>🎙️ Podcast</span> <span class="opacity-70 hidden md:inline">Listen</span>
-                                </button>
-                                <button onclick="openTab('mindmap-tab'); generateMindmap();" class="bg-cyan-500/10 text-cyan-500 hover:bg-cyan-500/20 border border-cyan-500/30 p-2.5 rounded-lg text-xs font-bold flex justify-between items-center">
-                                    <span>🧠 Mindmap</span> <span class="opacity-70 hidden md:inline">Visualize</span>
-                                </button>
-                                <button onclick="openTab('rag-tab')" class="bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border border-emerald-500/30 p-2.5 rounded-lg text-xs font-bold flex justify-between items-center">
-                                    <span>💬 Ask RAG</span> <span class="opacity-70 hidden md:inline">Ask</span>
-                                </button>
-                                <button onclick="openTab('challenge-tab')" class="bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/30 p-2.5 rounded-lg text-xs font-bold flex justify-between items-center">
-                                    <span>⚔️ Debate</span> <span class="opacity-70 hidden md:inline">Challenge</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 h-[350px] flex flex-col overflow-hidden relative shadow-inner">
-                            <div id="empty-tab" class="tab-content active h-full justify-center items-center text-center text-slate-500 text-xs">
-                                Select a tool above to interact with the research data.
-                            </div>
-                            <div id="podcast-tab" class="tab-content h-full flex-col space-y-3">
-                                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                                    <h5 class="font-bold text-amber-500 text-xs">🔴 Live AI Script</h5>
-                                    <button onclick="stopPodcast()" class="text-[10px] bg-red-600/20 text-red-400 px-2 py-0.5 rounded">Stop</button>
-                                </div>
-                                <div id="podcast-box" class="text-xs text-slate-300 leading-relaxed italic overflow-y-auto flex-grow">Generating script...</div>
-                            </div>
-                            <div id="mindmap-tab" class="tab-content h-full flex-col">
-                                <h5 class="font-bold text-cyan-500 text-xs mb-2 border-b border-slate-800 pb-2">Architectural Mindmap</h5>
-                                <div id="mindmap-box" class="text-xs text-slate-400 overflow-auto flex-grow">Drawing...</div>
-                            </div>
-                            <div id="rag-tab" class="tab-content h-full flex-col">
-                                <h5 class="font-bold text-emerald-500 text-xs mb-2 border-b border-slate-800 pb-2">Query Scraped Sources</h5>
-                                <div id="rag-chat" class="flex-grow overflow-y-auto space-y-2 mb-2 text-xs pr-1"></div>
-                                <div class="flex gap-2 mt-auto">
-                                    <input type="text" id="rag-input" placeholder="Ask something..." class="flex-grow bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 text-xs outline-none">
-                                    <button onclick="sendRAG()" class="bg-emerald-600 px-3 rounded font-bold text-xs">Ask</button>
-                                </div>
-                            </div>
-                            <div id="challenge-tab" class="tab-content h-full flex-col">
-                                <h5 class="font-bold text-red-500 text-xs mb-2 border-b border-slate-800 pb-2">Debate the Findings</h5>
-                                <div id="challenge-chat" class="flex-grow overflow-y-auto space-y-2 mb-2 text-xs pr-1"></div>
-                                <div class="flex gap-2 mt-auto">
-                                    <input type="text" id="challenge-input" placeholder="I disagree because..." class="flex-grow bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 text-xs outline-none">
-                                    <button onclick="sendChallenge()" class="bg-red-600 px-3 rounded font-bold text-xs">Send</button>
-                                </div>
+                    <div class="lg:col-span-1 space-y-4 sticky top-6">
+                        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 h-[400px] flex flex-col relative">
+                            <div id="rag-chat" class="flex-grow overflow-y-auto space-y-2 mb-2 text-xs"></div>
+                            <div class="flex gap-2">
+                                <input type="text" id="rag-input" placeholder="Ask AI about this..." class="flex-grow bg-slate-900 border border-slate-700 rounded px-2 text-xs text-white">
+                                <button onclick="sendRAG()" class="bg-emerald-600 px-3 py-1.5 rounded font-bold text-xs">Ask</button>
                             </div>
                         </div>
                     </div>
@@ -197,253 +71,94 @@
     </div>
 
     <script>
-        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
         let currentTopic = "";
 
-        // UI Helpers
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('mobile-overlay');
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-        }
-
-        function closeMobileSidebar() {
-            if (window.innerWidth < 768) {
-                document.getElementById('sidebar').classList.add('-translate-x-full');
-                document.getElementById('mobile-overlay').classList.add('hidden');
-            }
-        }
-
-        function openTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-        }
-
-        function changeZoom(val) {
-            document.getElementById('zoom-val').innerText = val;
-            document.getElementById('report-content').style.fontSize = val + '%';
-        }
-
-        // History Management
+        // 🔴 PRIVACY FIX: LocalStorage History Management
         window.addEventListener('DOMContentLoaded', loadHistory);
-
-        async function loadHistory() {
+        function loadHistory() {
             const hList = document.getElementById('history-list');
-            try {
-                const res = await fetch('/api/history');
-                const data = await res.json();
-                if (data.history && data.history.length > 0) {
-                    hList.innerHTML = data.history.map(item => `
-                        <button onclick="loadPastReport('${item.safe_topic}')" 
-                                class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800/80 text-slate-300 hover:text-teal-400 transition truncate flex items-center gap-2 group">
-                            <span class="text-slate-500 group-hover:text-teal-400">📄</span>
-                            <span class="truncate">${item.title}</span>
-                        </button>
-                    `).join('');
-                } else {
-                    hList.innerHTML = `<p class="text-slate-600 text-[11px] px-2 italic">No past researches yet.</p>`;
-                }
-            } catch (e) {
-                hList.innerHTML = `<p class="text-red-400 text-[11px] px-2">Failed to load history.</p>`;
+            const history = JSON.parse(localStorage.getItem('thesis_history') || '[]');
+            if (history.length > 0) {
+                hList.innerHTML = history.map(item => `<button onclick="loadPastReport('${item.id}')" class="w-full text-left py-2 hover:text-teal-400 truncate">${item.title}</button>`).join('');
+            } else { hList.innerHTML = "No drafts yet."; }
+        }
+
+        function saveToHistory(safe_topic, title) {
+            let history = JSON.parse(localStorage.getItem('thesis_history') || '[]');
+            if(!history.find(i => i.id === safe_topic)) {
+                history.unshift({id: safe_topic, title: title});
+                localStorage.setItem('thesis_history', JSON.stringify(history));
+                loadHistory();
             }
         }
 
         async function loadPastReport(safeTopic) {
-            closeMobileSidebar();
-            
-            document.getElementById('rag-chat').innerHTML = "";
-            document.getElementById('challenge-chat').innerHTML = "";
-
             document.getElementById('form-container').classList.add('hidden');
-            document.getElementById('terminal-container').classList.add('hidden');
-            
             const resContainer = document.getElementById('result-container');
             const reportContent = document.getElementById('report-content');
-            
-            reportContent.innerHTML = "<p class='text-teal-400 font-mono text-sm animate-pulse'>Loading saved research...</p>";
             resContainer.classList.remove('hidden');
-
-            try {
-                const res = await fetch(`/api/report/${safeTopic}`);
-                const data = await res.json();
-                if (data.report) {
-                    currentTopic = data.safe_topic;
-                    document.getElementById('res-topic').innerText = data.topic;
-                    document.getElementById('download-md').href = data.md_path;
-                    document.getElementById('download-html').href = data.html_path;
-                    reportContent.innerHTML = data.report;
-                } else {
-                    reportContent.innerHTML = "<p class='text-red-400'>Error loading report.</p>";
-                }
-            } catch (e) {
-                reportContent.innerHTML = "<p class='text-red-400'>Failed to fetch report from server.</p>";
+            
+            const res = await fetch(`/api/report/${safeTopic}`);
+            const data = await res.json();
+            if(data.report) {
+                currentTopic = data.safe_topic;
+                document.getElementById('res-topic').innerText = data.topic;
+                // DOMPurify applied again on client side
+                reportContent.innerHTML = DOMPurify.sanitize(data.report); 
             }
         }
 
         function showNewResearchForm() {
-            closeMobileSidebar();
             document.getElementById('result-container').classList.add('hidden');
-            document.getElementById('terminal-container').classList.add('hidden');
             document.getElementById('form-container').classList.remove('hidden');
         }
 
-        // Deep Synthesis Pipeline
         function startResearch(event) {
             event.preventDefault();
             const topic = document.getElementById('topic-input').value;
-            const lang = document.getElementById('lang-input').value;
-            
             document.getElementById('form-container').classList.add('hidden');
             document.getElementById('terminal-container').classList.remove('hidden');
             
-            const logs = document.getElementById('logs');
-            const pBar = document.getElementById('progress-bar');
-            const pPct = document.getElementById('progress-pct');
-            const sText = document.getElementById('status-text');
-            
-            const evtSource = new EventSource(`/stream-research?topic=${encodeURIComponent(topic)}&language=${lang}`);
-            
+            const evtSource = new EventSource(`/stream-research?topic=${encodeURIComponent(topic)}&language=english`);
             evtSource.onmessage = function(e) {
                 let data = e.data;
                 if (data.startsWith("[PROGRESS:")) {
                     const match = data.match(/\[PROGRESS:(\d+)\](.*)/);
-                    if (match) {
-                        const pct = match[1];
-                        pBar.style.width = pct + '%';
-                        pPct.innerText = pct + '%';
-                        sText.innerText = match[2];
-                        logs.innerHTML += `<div>${match[2]}</div>`;
-                        logs.scrollTop = logs.scrollHeight;
-                    }
+                    document.getElementById('progress-bar').style.width = match[1] + '%';
+                    document.getElementById('status-text').innerText = match[2];
                 } else if (data.startsWith("{")) {
-                    try {
-                        const json = JSON.parse(data);
-                        if (json.status === "done") {
-                            evtSource.close();
-                            currentTopic = json.metrics.safe_topic;
-                            document.getElementById('res-topic').innerText = json.topic;
-                            document.getElementById('download-md').href = json.metrics.md_path;
-                            document.getElementById('download-html').href = json.metrics.html_path;
-                            document.getElementById('report-content').innerHTML = json.report;
-                            
-                            document.getElementById('terminal-container').classList.add('hidden');
-                            document.getElementById('result-container').classList.remove('hidden');
-                            
-                            document.getElementById('rag-chat').innerHTML = "";
-                            document.getElementById('challenge-chat').innerHTML = "";
-                            
-                            loadHistory();
-                        }
-                    } catch(err) {}
+                    const json = JSON.parse(data);
+                    if (json.status === "done") {
+                        evtSource.close();
+                        currentTopic = json.metrics.safe_topic;
+                        saveToHistory(currentTopic, json.topic);
+                        
+                        document.getElementById('res-topic').innerText = json.topic;
+                        document.getElementById('download-md').href = json.metrics.md_path;
+                        // DOMPurify
+                        document.getElementById('report-content').innerHTML = DOMPurify.sanitize(json.report);
+                        
+                        document.getElementById('terminal-container').classList.add('hidden');
+                        document.getElementById('result-container').classList.remove('hidden');
+                    }
                 }
             };
         }
 
-        // Interactive Tools - Podcast
-        let podcastPlaying = false;
-        window.currentUtt = null;
-
-        async function startPodcastMode() {
-            const report = document.getElementById('report-content').innerText;
-            const box = document.getElementById('podcast-box');
-            box.innerHTML = "Generating script...";
+        async function sendRAG() {
+            const input = document.getElementById('rag-input');
+            const box = document.getElementById('rag-chat');
+            const query = input.value; input.value = "";
+            box.innerHTML += `<div class="text-white text-right bg-slate-800 p-2 rounded text-xs ml-6">${DOMPurify.sanitize(query)}</div>`;
             
-            try {
-                const res = await fetch('/generate-podcast', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({report_text: report})
-                });
-                const data = await res.json();
-                if (data.script) playPodcastStream(data.script, box);
-                else box.innerHTML = "<span class='text-red-400'>Error generating podcast</span>";
-            } catch (e) { box.innerHTML = e.message; }
-        }
-
-        function playPodcastStream(scriptArr, box) {
-            window.speechSynthesis.cancel();
-            podcastPlaying = true;
-            let i = 0;
-            function playNext() {
-                if (!podcastPlaying || i >= scriptArr.length) return;
-                const line = scriptArr[i];
-                const color = line.speaker.includes('A') ? 'text-teal-400' : 'text-emerald-400';
-                box.innerHTML = `<strong class="${color}">${line.speaker}:</strong> <span class="text-white">${line.text}</span>`;
-                
-                const utt = new SpeechSynthesisUtterance(line.text);
-                utt.rate = 1.05;
-                utt.pitch = line.speaker.includes('A') ? 1.1 : 0.9;
-                
-                utt.onend = () => { i++; playNext(); };
-                utt.onerror = (e) => { console.log("TTS Error:", e); i++; playNext(); };
-                
-                window.currentUtt = utt; 
-                window.speechSynthesis.speak(utt);
-            }
-            playNext();
-        }
-        
-        function stopPodcast() { 
-            podcastPlaying = false; 
-            window.speechSynthesis.cancel(); 
-        }
-
-        // Interactive Tools - Mindmap
-        async function generateMindmap() {
-            const box = document.getElementById('mindmap-box');
-            box.innerHTML = "Synthesizing diagram...";
-            const report = document.getElementById('report-content').innerText;
-            
-            try {
-                const res = await fetch('/generate-diagram', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({report_text: report})
-                });
-                
-                if (!res.ok) {
-                    throw new Error(`Server Timeout or Crash (Status: ${res.status}). Check backend logs.`);
-                }
-
-                const data = await res.json();
-                if (data.mermaid) {
-                    box.innerHTML = `<div class="mermaid">${data.mermaid}</div>`;
-                    mermaid.init(undefined, document.querySelectorAll('.mermaid'));
-                } else {
-                    box.innerHTML = "Error generating diagram.";
-                }
-            } catch (e) { 
-                box.innerHTML = `<span class="text-red-400 font-bold text-xs">${e.message}</span>`; 
-            }
-        }
-
-        // Interactive Tools - RAG & Challenge Chat
-        async function handleChat(endpoint, inputId, boxId, userColor, aiColor) {
-            const input = document.getElementById(inputId);
-            const box = document.getElementById(boxId);
-            const query = input.value.trim();
-            if(!query) return;
-            
-            input.value = "";
-            box.innerHTML += `<div class="${userColor} text-right bg-slate-800 p-1.5 rounded ml-6 text-xs">${query}</div>`;
-            box.innerHTML += `<div id="typing-${boxId}" class="${aiColor} bg-slate-950 p-1.5 rounded mr-6 border border-slate-800 text-xs">Thinking...</div>`;
-            box.scrollTop = box.scrollHeight;
-
-            try {
-                const res = await fetch(endpoint, {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({topic: currentTopic, query: query})
-                });
-                const data = await res.json();
-                document.getElementById(`typing-${boxId}`).remove();
-                box.innerHTML += `<div class="${aiColor} bg-slate-950 p-1.5 rounded mr-6 border border-slate-800 markdown-body text-xs" style="font-size:0.75rem">${data.answer || data.error}</div>`;
-            } catch (e) {
-                document.getElementById(`typing-${boxId}`).innerText = "Error contacting API.";
-            }
+            const res = await fetch('/ask-rag', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({topic: currentTopic, query: query}) // using query field
+            });
+            const data = await res.json();
+            box.innerHTML += `<div class="text-emerald-300 bg-slate-950 p-2 rounded text-xs mr-6">${DOMPurify.sanitize(data.answer)}</div>`;
             box.scrollTop = box.scrollHeight;
         }
-
-        function sendRAG() { handleChat('/ask-rag', 'rag-input', 'rag-chat', 'text-white', 'text-emerald-300'); }
-        function sendChallenge() { handleChat('/challenge-report', 'challenge-input', 'challenge-chat', 'text-white', 'text-red-300'); }
     </script>
 </body>
 </html>
