@@ -109,22 +109,43 @@ def generate_podcast_script(report_text: str):
         return [{"speaker": "System", "text": "JSON Parsing Error."}]
 
 def generate_diagram(report_text: str):
-    # 🚀 FIX: Fast 8B Model & Extremely strict prompt
     prompt = f"""
-    Create a simple Mermaid.js flowchart ('graph TD') summarizing this report. 
+    You are a strict Mermaid.js compiler. Create a flowchart summarizing the core pillars of the report.
     CRITICAL RULES:
-    1. Use simple alphanumeric IDs (e.g., A, B, C).
-    2. Node text MUST NOT contain any parentheses (), square brackets [], or quotes "". Keep text plain.
-    3. Example format: A[Main Concept] --> B[Sub Concept]
-    4. RETURN STRICTLY MERMAID CODE. NO MARKDOWN.
-    Report: {report_text[:8000]}
-    """
-    # 8B model call kiya taaki Render par Timeout (100s limit) na ho
-    res = call_nvidia_api(prompt, max_tokens=1000, temp=0.1, model="meta/llama-3.1-8b-instruct")
+    1. Start exactly with 'graph TD'.
+    2. Use simple letters for Node IDs (e.g., A, B, C).
+    3. Node text MUST NOT contain parentheses (), square brackets [], quotes "", or special characters. Use plain letters and spaces only.
+    4. Example: A[Data Analysis] --> B[Market Trends]
+    5. RETURN ONLY RAW MERMAID CODE. NO MARKDOWN, NO BACKTICKS.
     
-    clean_code = res.replace("```mermaid", "").replace("```", "").strip()
-    valid_lines = [line for line in clean_code.split('\n') if not line.lower().startswith('here') and not line.lower().startswith('sure')]
-    return "\n".join(valid_lines)
+    Report: {report_text[:6000]}
+    """
+    try:
+        # Calling your existing API function
+        res = call_nvidia_api(prompt, max_tokens=1000, temp=0.1)
+        
+        # 1. Clean markdown backticks
+        res = res.replace("```mermaid", "").replace("```", "").strip()
+        
+        # 2. AGGRESSIVE CLEANER: Cut everything before 'graph TD' (Removes "Here is your code")
+        if "graph " in res:
+            res = "graph " + res.split("graph ")[1]
+            
+        # 3. Filter out random conversational lines LLM might add at the end
+        valid_lines = []
+        for line in res.split('\n'):
+            line = line.strip()
+            if not line.lower().startswith(('here', 'sure', 'note:', 'this diagram')):
+                valid_lines.append(line)
+                
+        final_mermaid = "\n".join(valid_lines)
+        return final_mermaid
+        
+    except Exception as e:
+        # Fail-safe: Agar error aaye toh UI crash hone ki jagah error node dikhaye
+        safe_error = str(e).replace('(', '').replace(')', '').replace('[', '').replace(']', '')
+        return f"graph TD\n Z[Diagram Error] --> Y[{safe_error}]"
+
 
 def rag_query(context: str, query: str):
     prompt = f"Answer this query based ONLY on the context provided.\nContext: {context[:20000]}\nQuestion: {query}"
