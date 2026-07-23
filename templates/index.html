@@ -39,15 +39,12 @@
     <div id="mobile-overlay" class="fixed inset-0 bg-black/70 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
 
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 border-r border-slate-800/80 flex flex-col h-screen transform -translate-x-full transition-transform duration-300 ease-in-out md:relative md:translate-x-0 md:shrink-0">
-        
         <div class="p-4 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <span class="text-xl">🎓</span>
                 <h1 class="text-base font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-500 bg-clip-text text-transparent">ThesisPilot</h1>
             </div>
-            <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white p-1">
-                ✖
-            </button>
+            <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white p-1">✖</button>
             <span class="hidden md:inline-block text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">V5.0</span>
         </div>
 
@@ -73,9 +70,7 @@
                 <h1 class="text-base font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-500 bg-clip-text text-transparent">ThesisPilot</h1>
             </div>
             <button onclick="toggleSidebar()" class="text-slate-300 hover:text-white p-1">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
         </div>
 
@@ -104,7 +99,6 @@
             <div id="terminal-container" class="hidden max-w-xl mx-auto w-full py-10 space-y-4">
                 <h3 class="text-center font-bold text-slate-300">Pipeline Executing...</h3>
                 <p id="status-text" class="text-center text-xs text-teal-400 font-mono">Initializing agents...</p>
-                
                 <div class="w-full bg-slate-900 rounded-full h-3 p-0.5 border border-slate-800">
                     <div id="progress-bar" class="progress-shimmer h-2 rounded-full transition-all duration-500" style="width:5%"></div>
                 </div>
@@ -112,7 +106,6 @@
                     <span>Progress</span>
                     <span id="progress-pct">5%</span>
                 </div>
-
                 <div id="logs" class="bg-black text-[10px] text-emerald-400 p-4 rounded-xl h-40 overflow-y-auto border border-slate-800 whitespace-pre-wrap font-mono"></div>
             </div>
 
@@ -122,12 +115,10 @@
                         <span class="text-[10px] text-slate-500 uppercase font-bold">Active Topic</span>
                         <h3 id="res-topic" class="text-sm md:text-base font-bold text-white capitalize"></h3>
                     </div>
-
                     <div class="hidden md:flex items-center space-x-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
                         <span class="text-[10px] text-slate-400 font-semibold uppercase">Zoom: <span id="zoom-val" class="text-teal-400 font-bold">100</span>%</span>
                         <input type="range" min="50" max="150" value="100" step="5" oninput="changeZoom(this.value)" class="w-20 accent-teal-500 cursor-pointer">
                     </div>
-
                     <div class="flex flex-wrap items-center gap-2">
                         <a id="download-md" href="#" download class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-lg font-medium transition border border-slate-700 text-slate-300">.md</a>
                         <a id="download-html" href="#" download class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-lg font-medium transition border border-slate-700 text-slate-300">.html</a>
@@ -143,7 +134,6 @@
                     <div class="lg:col-span-1 space-y-4 md:sticky top-6">
                         <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
                             <h4 class="font-bold text-teal-400 mb-3 border-b border-slate-800 pb-2 text-sm">🛠 Interactive Tools</h4>
-                            
                             <div class="grid grid-cols-2 lg:grid-cols-1 gap-2.5">
                                 <button onclick="openTab('podcast-tab'); startPodcastMode();" class="bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 border border-amber-500/30 p-2.5 rounded-lg text-xs font-bold flex justify-between items-center">
                                     <span>🎙️ Podcast</span> <span class="opacity-70 hidden md:inline">Listen</span>
@@ -164,7 +154,6 @@
                             <div id="empty-tab" class="tab-content active h-full justify-center items-center text-center text-slate-500 text-xs">
                                 Select a tool above to interact with the research data.
                             </div>
-
                             <div id="podcast-tab" class="tab-content h-full flex-col space-y-3">
                                 <div class="flex justify-between items-center border-b border-slate-800 pb-2">
                                     <h5 class="font-bold text-amber-500 text-xs">🔴 Live AI Script</h5>
@@ -172,12 +161,10 @@
                                 </div>
                                 <div id="podcast-box" class="text-xs text-slate-300 leading-relaxed italic overflow-y-auto flex-grow">Generating script...</div>
                             </div>
-
                             <div id="mindmap-tab" class="tab-content h-full flex-col">
                                 <h5 class="font-bold text-cyan-500 text-xs mb-2 border-b border-slate-800 pb-2">Architectural Mindmap</h5>
                                 <div id="mindmap-box" class="text-xs text-slate-400 overflow-auto flex-grow">Drawing...</div>
                             </div>
-
                             <div id="rag-tab" class="tab-content h-full flex-col">
                                 <h5 class="font-bold text-emerald-500 text-xs mb-2 border-b border-slate-800 pb-2">Query Scraped Sources</h5>
                                 <div id="rag-chat" class="flex-grow overflow-y-auto space-y-2 mb-2 text-xs pr-1"></div>
@@ -186,7 +173,6 @@
                                     <button onclick="sendRAG()" class="bg-emerald-600 px-3 rounded font-bold text-xs">Ask</button>
                                 </div>
                             </div>
-
                             <div id="challenge-tab" class="tab-content h-full flex-col">
                                 <h5 class="font-bold text-red-500 text-xs mb-2 border-b border-slate-800 pb-2">Debate the Findings</h5>
                                 <div id="challenge-chat" class="flex-grow overflow-y-auto space-y-2 mb-2 text-xs pr-1"></div>
@@ -206,7 +192,7 @@
         mermaid.initialize({ startOnLoad: false, theme: 'dark' });
         let currentTopic = "";
 
-        // 🚀 NEW FUNCTION: Toggle Sidebar on Mobile
+        // UI Helpers
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('mobile-overlay');
@@ -214,14 +200,24 @@
             overlay.classList.toggle('hidden');
         }
 
-        // 🚀 NEW FUNCTION: Auto-close sidebar on mobile after clicking a button
         function closeMobileSidebar() {
-            if (window.innerWidth < 768) { // Tailwinds 'md' breakpoint
+            if (window.innerWidth < 768) {
                 document.getElementById('sidebar').classList.add('-translate-x-full');
                 document.getElementById('mobile-overlay').classList.add('hidden');
             }
         }
 
+        function openTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function changeZoom(val) {
+            document.getElementById('zoom-val').innerText = val;
+            document.getElementById('report-content').style.fontSize = val + '%';
+        }
+
+        // History Management
         window.addEventListener('DOMContentLoaded', loadHistory);
 
         async function loadHistory() {
@@ -229,7 +225,6 @@
             try {
                 const res = await fetch('/api/history');
                 const data = await res.json();
-                
                 if (data.history && data.history.length > 0) {
                     hList.innerHTML = data.history.map(item => `
                         <button onclick="loadPastReport('${item.safe_topic}')" 
@@ -247,7 +242,11 @@
         }
 
         async function loadPastReport(safeTopic) {
-            closeMobileSidebar(); // 👈 Call auto-close function here
+            closeMobileSidebar();
+            
+            // 🚀 BUG FIX: Naya report load hone par purani chat history clear karo
+            document.getElementById('rag-chat').innerHTML = "";
+            document.getElementById('challenge-chat').innerHTML = "";
 
             document.getElementById('form-container').classList.add('hidden');
             document.getElementById('terminal-container').classList.add('hidden');
@@ -261,7 +260,6 @@
             try {
                 const res = await fetch(`/api/report/${safeTopic}`);
                 const data = await res.json();
-                
                 if (data.report) {
                     currentTopic = data.safe_topic;
                     document.getElementById('res-topic').innerText = data.topic;
@@ -277,23 +275,13 @@
         }
 
         function showNewResearchForm() {
-            closeMobileSidebar(); // 👈 Call auto-close function here
-
+            closeMobileSidebar();
             document.getElementById('result-container').classList.add('hidden');
             document.getElementById('terminal-container').classList.add('hidden');
             document.getElementById('form-container').classList.remove('hidden');
         }
 
-        function openTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-        }
-
-        function changeZoom(val) {
-            document.getElementById('zoom-val').innerText = val;
-            document.getElementById('report-content').style.fontSize = val + '%';
-        }
-
+        // Deep Synthesis Pipeline
         function startResearch(event) {
             event.preventDefault();
             const topic = document.getElementById('topic-input').value;
@@ -335,12 +323,20 @@
                             document.getElementById('terminal-container').classList.add('hidden');
                             document.getElementById('result-container').classList.remove('hidden');
                             
+                            // 🚀 BUG FIX: Fresh research banne par purani chats clear karo
+                            document.getElementById('rag-chat').innerHTML = "";
+                            document.getElementById('challenge-chat').innerHTML = "";
+                            
                             loadHistory();
                         }
                     } catch(err) {}
                 }
             };
         }
+
+        // Interactive Tools - Podcast
+        let podcastPlaying = false;
+        window.currentUtt = null; // 🚀 BUG FIX: Browser Garbage collection bypass
 
         async function startPodcastMode() {
             const report = document.getElementById('report-content').innerText;
@@ -358,8 +354,8 @@
             } catch (e) { box.innerHTML = e.message; }
         }
 
-        let podcastPlaying = false;
         function playPodcastStream(scriptArr, box) {
+            window.speechSynthesis.cancel(); // 🚀 BUG FIX: Purana audio clear karo
             podcastPlaying = true;
             let i = 0;
             function playNext() {
@@ -371,13 +367,22 @@
                 const utt = new SpeechSynthesisUtterance(line.text);
                 utt.rate = 1.05;
                 utt.pitch = line.speaker.includes('A') ? 1.1 : 0.9;
+                
                 utt.onend = () => { i++; playNext(); };
+                utt.onerror = (e) => { console.log("TTS Error:", e); i++; playNext(); };
+                
+                window.currentUtt = utt; // Global reference to prevent garbage collection
                 window.speechSynthesis.speak(utt);
             }
             playNext();
         }
-        function stopPodcast() { podcastPlaying = false; window.speechSynthesis.cancel(); }
+        
+        function stopPodcast() { 
+            podcastPlaying = false; 
+            window.speechSynthesis.cancel(); 
+        }
 
+        // Interactive Tools - Mindmap
         async function generateMindmap() {
             const box = document.getElementById('mindmap-box');
             box.innerHTML = "Synthesizing diagram...";
@@ -396,6 +401,7 @@
             } catch (e) { box.innerHTML = e.message; }
         }
 
+        // Interactive Tools - RAG & Challenge Chat
         async function handleChat(endpoint, inputId, boxId, userColor, aiColor) {
             const input = document.getElementById(inputId);
             const box = document.getElementById(boxId);

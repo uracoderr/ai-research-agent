@@ -109,15 +109,20 @@ def generate_podcast_script(report_text: str):
         return [{"speaker": "System", "text": "JSON Parsing Error."}]
 
 def generate_diagram(report_text: str):
-    prompt = f"Create a detailed Mermaid.js flowchart ('graph TD') summarizing this report. \nRETURN STRICTLY MERMAID CODE. NO MARKDOWN. NO EXPLANATIONS.\nReport: {report_text[:8000]}"
-    # Switch to 8B
+    # 🚀 FIX: Extremely strict prompt to avoid Mermaid syntax errors
+    prompt = f"""
+    Create a simple Mermaid.js flowchart ('graph TD') summarizing this report. 
+    CRITICAL RULES:
+    1. Use simple alphanumeric IDs (e.g., A, B, C).
+    2. Node text MUST NOT contain any parentheses (), square brackets [], or quotes "". Keep text plain.
+    3. Example format: A[Main Concept] --> B[Sub Concept]
+    4. RETURN STRICTLY MERMAID CODE. NO MARKDOWN.
+    Report: {report_text[:8000]}
+    """
     res = call_nvidia_api(prompt, max_tokens=1000, temp=0.1, model="meta/llama-3.1-8b-instruct")
     
-    # Robust cleanup for Mermaid
     clean_code = res.replace("```mermaid", "").replace("```", "").strip()
-    # Remove any line that isn't part of the graph (in case LLM says "Here is the code:")
-    lines = clean_code.split('\n')
-    valid_lines = [line for line in lines if not line.lower().startswith('here') and not line.lower().startswith('sure')]
+    valid_lines = [line for line in clean_code.split('\n') if not line.lower().startswith('here') and not line.lower().startswith('sure')]
     return "\n".join(valid_lines)
 
 def rag_query(context: str, query: str):
